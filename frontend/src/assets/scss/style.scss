@@ -66,7 +66,13 @@ main {
    .gameScreen {
  	width: 100%;
 	height: 80vh;
-	background: #90c0a5;
+	background: #ffffff;
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	grid-template-rows: repeat(4, 1fr);
+	gap: 10px;
+	justify-items: center;
+	align-items: center;
    }
   
   #scoreboard {
@@ -114,4 +120,8 @@ main {
 	width: 100%;
 	height: 10vh;
 	background-color: #333;
+  }
+
+  .cell  {
+	font-size: xx-large;
   }
