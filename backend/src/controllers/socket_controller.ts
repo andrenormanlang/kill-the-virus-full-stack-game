@@ -7,11 +7,12 @@ import prisma from '../prisma'
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/socket_types'
 
 // Create a new debug instance
-const debug = Debug('chat:socket_controller')
+const debug = Debug('ktv:socket_controller')
 
 // Handle the user connecting
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
 	debug('🙋🏼 A user connected', socket.id)
+	
 
 	// Say hello to the user
 	debug('👋🏻 Said hello to the user')

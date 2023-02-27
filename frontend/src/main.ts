@@ -1,4 +1,8 @@
 import './assets/scss/style.scss'
+import { io, Socket } from 'socket.io-client'
+
+const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
+const socket = io(SOCKET_HOST)
 
 const usernameForm = document.querySelector<HTMLFormElement>('#usernameForm')
 const inputEl = document.querySelector<HTMLInputElement>('#input')
