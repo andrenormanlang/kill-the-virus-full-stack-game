@@ -1,17 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="/src/assets/scss/style.scss">
-	<title>KTV</title>
-</head>
-
-<body>
-
-	<script type="module" src="/src/main.ts"></script>
-</body>
-
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="/src/assets/scss/style.scss" />
+		<title>KTV</title>
+	</head>
+	<body>
+		<form class="username" id="usernameForm">
+			<input id="input" type="text" required placeholder="Enter username"/>
+			<button class="enter-btn" id="enter">ENTER</button>
+		</form>
+		<div id="lobby">
+			<header>
+      <h1>Game Lobby</h1>
+      <div class="stats">
+        <p>Number of games: <span id="numGames"></span></p>
+        <p>High score: <span id="highScore"></span></p>
+      </div>
+    </header>
+    <main>
+        <button id="joinGame" type="submit">Join Game</button>
+      </form>
+      <h2>Current games</h2>
+      <ul id="gameList"></ul>
+    </main>
+		</div>
+		<div id="game" >
+			<div id="gameboard">
+			</div>
+			<div id="scoreboard">
+				<div class="scoreHeader">ScoreBoard</div>
+				<div class="currentScore">3 - 1</div>
+				<div class="scoreWrapper">
+				<div class="you">
+					<div>You</div>
+					<div>00:01.532</div>
+				</div>
+				<div class="opponent">
+					<div>Opponent</div>
+					<div>00:01.532</div>
+				</div>
+			</div>
+			</div>
+		  </div>
+		<script type="module" src="/src/main.ts"></script>
+	</body>
 </html>
