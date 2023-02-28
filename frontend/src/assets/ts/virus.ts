@@ -38,11 +38,30 @@ if (joinGameBtn && lobbyEl && gameEl) {
 }
 
 let virusTimeout: number;
+let round = 0
+
+const nextVirus = (randomCell: HTMLDivElement) => {
+	round++
+	console.log('Round:', round)
+
+	randomCell.addEventListener('click', () => {
+		// Remove any existing virus emoji
+		const existingVirus = document.querySelector('.cell-virus');
+		if (existingVirus) {
+			existingVirus.textContent = '';
+			existingVirus.classList.remove('cell-virus');
+		}
+
+		if (round >= 10) return
+		
+		displayVirus()
+	})
+}
 
 function displayVirus() {
 	const cells = document.querySelectorAll('.cell');
 	const randomIndex = Math.floor(Math.random() * cells.length);
-	const randomCell = cells[randomIndex];
+	const randomCell = cells[randomIndex] as HTMLDivElement
 
 	const randomTime = Math.ceil(Math.random() * 5)
 	console.log(randomTime)
@@ -54,21 +73,5 @@ function displayVirus() {
 		randomCell.classList.add('cell-virus');
 	}, randomTime * 1000);
 
-	randomCell.addEventListener('click', () => {
-		// Remove any existing virus emoji
-		const existingVirus = document.querySelector('.cell-virus');
-		if (existingVirus) {
-			existingVirus.textContent = '';
-			existingVirus.classList.remove('cell-virus');
-		}
-
-		// Man ska inte kalla på funktionen man är i, det blir buggit. Fixa.
-		displayVirus()
-	})
+	nextVirus(randomCell)
 }
-
-
-
-// // Schedule the first virus display
-// const randomTime = Math.floor(Math.random() * 10) + 1;
-// virusTimeout = setTimeout(displayVirus, randomTime * 1000);
