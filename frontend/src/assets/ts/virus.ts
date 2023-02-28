@@ -1,4 +1,4 @@
-export {}
+export { }
 
 const usernameForm = document.querySelector<HTMLFormElement>('#usernameForm')
 const inputEl = document.querySelector<HTMLInputElement>('#input')
@@ -35,6 +35,22 @@ if (joinGameBtn && lobbyEl && gameEl) {
 	})
 }
 
+const numRows = 4;
+const numCols = 4;
+
+function renderGameScreen() {
+	let cells = '';
+	for (let i = 0; i < numRows; i++) {
+		for (let j = 0; j < numCols; j++) {
+			cells += '<div class="cell"></div>';
+		}
+	}
+	const gameScreen = document.querySelector('.gameScreen');
+	gameScreen!.innerHTML = cells;
+}
+
+renderGameScreen()
+
 let virusTimeout: number;
 
 function displayVirus() {
@@ -61,3 +77,5 @@ function displayVirus() {
 // Schedule the first virus display
 const randomTime = Math.floor(Math.random() * 10) + 1;
 virusTimeout = setTimeout(displayVirus, randomTime * 1000);
+
+
