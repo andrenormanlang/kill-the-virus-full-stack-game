@@ -29,8 +29,14 @@ usernameFormEl.addEventListener('submit', e => {
 	username = (usernameFormEl.querySelector('#username-input') as HTMLInputElement).value.trim()
 	if (!username) return
 
+	socket.emit('userJoinedLobby', username);
 
-	socket.emit('userJoinedLobby', username)
+	// gridCol and gridRow will be calculated in backend and sent here
+	const gridCol = 5
+	const gridRow = 5;
+	(document.querySelector('#gameScreen') as HTMLDivElement).innerHTML = `
+		<div class="cell" style="grid-row: ${gridRow}; grid-column: ${gridCol};">🦠</div>
+	`
 })
 
 export default socket
