@@ -1,4 +1,5 @@
 import './assets/scss/style.scss'
+import './rounds'
 
 const usernameForm = document.querySelector<HTMLFormElement>('#usernameForm')
 const inputEl = document.querySelector<HTMLInputElement>('#input')
