@@ -11,7 +11,7 @@ export interface ServerToClientEvents {
 
 // Events emitted by the client to the server
 export interface ClientToServerEvents {
-	userJoinedLobby: (username: string) => void
+	// userJoinedLobby: (username: string) => void
 	userJoinedGame: (usernae: string) => void
 }
 

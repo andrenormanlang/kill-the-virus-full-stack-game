@@ -19,9 +19,9 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 	socket.emit('hello')
 
-	socket.on('userJoinedLobby', (username) => {
-		debug('Welcome to the lobby', username)
-	})
+	// socket.on('userJoinedLobby', (username) => {
+	// 	debug('Welcome to the lobby', username)
+	// })
 
 	socket.on('userJoinedGame', (username) => {
 		debug(username, 'joined a game')

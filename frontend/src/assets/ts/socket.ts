@@ -29,7 +29,7 @@ usernameFormEl.addEventListener('submit', e => {
 	username = (usernameFormEl.querySelector('#username-input') as HTMLInputElement).value.trim()
 	if (!username) return
 
-	socket.emit('userJoinedLobby', username)
+	// socket.emit('userJoinedLobby', username)
 	socket.emit('userJoinedGame', username)
 
 	socket.on('showVirus', (row, column, delay) => {
