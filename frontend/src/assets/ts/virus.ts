@@ -1,26 +1,7 @@
-export {}
-
-const usernameForm = document.querySelector<HTMLFormElement>('#usernameForm')
-const inputEl = document.querySelector<HTMLInputElement>('#input')
+export { }
 const lobbyEl = document.querySelector<HTMLDivElement>('#lobby')
 
-if (usernameForm && inputEl && lobbyEl) {
-	usernameForm.addEventListener('submit', (e) => {
-		e.preventDefault()
-
-		const username = inputEl.value.trim()
-
-		if (username) {
-			// Hide the username input
-			usernameForm.style.display = 'none'
-
-			// Show the lobby
-			lobbyEl.style.display = 'block'
-		}
-	})
-}
-
-const joinGameBtn = document.querySelector<HTMLButtonElement>('#joinGame')
+const joinGameBtn = document.querySelector<HTMLButtonElement>('#enter')
 const gameEl = document.querySelector<HTMLDivElement>('#game')
 
 if (joinGameBtn && lobbyEl && gameEl) {
@@ -36,6 +17,22 @@ if (joinGameBtn && lobbyEl && gameEl) {
 		displayVirus()
 	})
 }
+
+const numRows = 4;
+const numCols = 4;
+
+function renderGameScreen() {
+	let cells = '';
+	for (let i = 0; i < numRows; i++) {
+		for (let j = 0; j < numCols; j++) {
+			cells += '<div class="cell"></div>';
+		}
+	}
+	const gameScreen = document.querySelector('.gameScreen');
+	gameScreen!.innerHTML = cells;
+}
+
+renderGameScreen()
 
 let virusTimeout: number;
 let round = 0
