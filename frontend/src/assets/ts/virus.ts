@@ -39,24 +39,7 @@ if (joinGameBtn && lobbyEl && gameEl) {
 
 let virusTimeout: number;
 let round = 0
-
-const nextVirus = (randomCell: HTMLDivElement) => {
-	round++
-	console.log('Round:', round)
-
-	randomCell.addEventListener('click', () => {
-		// Remove any existing virus emoji
-		const existingVirus = document.querySelector('.cell-virus');
-		if (existingVirus) {
-			existingVirus.textContent = '';
-			existingVirus.classList.remove('cell-virus');
-		}
-
-		if (round >= 10) return
-		
-		displayVirus()
-	})
-}
+let timer: number
 
 function displayVirus() {
 	const cells = document.querySelectorAll('.cell');
@@ -64,14 +47,35 @@ function displayVirus() {
 	const randomCell = cells[randomIndex] as HTMLDivElement
 
 	const randomTime = Math.ceil(Math.random() * 5)
-	console.log(randomTime)
+	// console.log(randomTime)
 
 	setTimeout(() => {
-		console.log('VIRUS!')
+		// console.log('VIRUS!')
 		// Display the new virus emoji
 		randomCell.textContent = '🦠';
 		randomCell.classList.add('cell-virus');
+		timer = Date.now() / 1000
+
 	}, randomTime * 1000);
 
+	const timeTakenToClick = Number((Date.now() / 1000 - timer).toFixed(3))
+	console.log("It took", timeTakenToClick, "seconds")
+
 	nextVirus(randomCell)
+}
+
+const nextVirus = (randomCell: HTMLDivElement) => {
+	randomCell.addEventListener('click', () => {
+		round++
+		// Remove any existing virus emoji
+		const existingVirus = document.querySelector('.cell-virus');
+		if (existingVirus) {
+			existingVirus.textContent = '';
+			existingVirus.classList.remove('cell-virus');
+		}
+
+		if (round >= 10) return console.log("Good game, well played!")
+		
+		displayVirus()
+	})
 }
