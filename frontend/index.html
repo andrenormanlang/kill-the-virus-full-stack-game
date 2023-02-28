@@ -19,8 +19,10 @@
 			</div>
 		</header>
 		<main>
-			<input id="input" type="text" required placeholder="Enter username" />
-		<button class="enter-btn" id="enter">Play Game</button>
+			<form id="username-form">
+				<input id="username-input" type="text" required placeholder="Enter username" />
+				<button class="enter-btn" id="enter" type="submit">Play Game</button>
+			</form>
 			<h2>Current games:</h2>
 			<ul id="gameList"></ul>
 			<h2>Top 10 reaction times:</h2>
@@ -30,7 +32,7 @@
 	<div id="game">
 		<div id="gameboard">
 			<div class="virusHeader">Kill The Virus!</div>
-			<div class="gameScreen">	
+			<div class="gameScreen">
 			</div>
 		</div>
 		<div id="scoreboard">

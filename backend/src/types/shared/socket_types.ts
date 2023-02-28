@@ -10,7 +10,7 @@ export interface ServerToClientEvents {
 
 // Events emitted by the client to the server
 export interface ClientToServerEvents {
-
+	userJoinedLobby: (username: string) => void
 }
 
 export interface InterServerEvents { }
