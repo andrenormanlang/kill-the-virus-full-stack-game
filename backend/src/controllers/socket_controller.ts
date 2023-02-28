@@ -20,10 +20,21 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	socket.emit('hello')
 
 	socket.on('userJoinedLobby', (username) => {
-		debug('Welcome', username)
+		debug('Welcome to the lobby', username)
 	})
 
+	socket.on('userJoinedGame', (username) => {
+		debug(username, 'joined a game')
+
+		const row = Math.ceil(Math.random() * 10)
+		const column = Math.ceil(Math.random() * 10)
+		const delay = Math.ceil(Math.random() * 5) * 1000
+		
+		socket.emit('showVirus', row, column, delay)
+	})
 	
+
+
 
 
 
