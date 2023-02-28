@@ -7,10 +7,13 @@ let reactionTime:any = []
 // variable for reaction time (1 round)
 let scoreRound = 0
 
-let i = 0
+let round = 0
 
-let joinGameEl = document.querySelector("#joinGame")
-let gameScreenEl = document.querySelector(".gameScreen")
+const joinGameEl = document.querySelector("#joinGame")
+const gameScreenEl = document.querySelector(".gameScreen")
+const lobbyEl = document.querySelector<HTMLDivElement>('#lobby')
+const gameEl = document.querySelector<HTMLDivElement>('#game')
+
 
 
 // calculates the average reactionTime for all rounds
@@ -24,44 +27,43 @@ console.log(average)
 return average
 }
 
+joinGameEl?.addEventListener("click", (e) => {
+    e.stopImmediatePropagation;
+    playGame = true;
 
-// To start the game
-joinGameEl?.addEventListener("click", () => {
-    playGame = true
-    console.log(playGame)
-    
-    // Loop for 10 rounds
-    while (playGame) {
-        
-        // adds reaction time (score) to array
-        gameScreenEl!.addEventListener("click", (e:any) => {
-            console.log(e)
-            if (e.target.classList.contains('cell-virus')){
-                reactionTime.push(scoreRound)
+    // Eventlistener when clicking the virus
+    gameScreenEl!.addEventListener("click", (e:any) => {
+
+        while (playGame) {
+            if (e.target.classList.contains('cell-virus')) {
+                round++
+                scoreRound = 1//hårdkodat atm, add reaction time and then push to reactionTime array
                 
-                // to not make it too hasty changing after clicking on a virus
-                setTimeout(() => {
-                    i++
-                }, 2000)
-                console.log(i)
+                console.log(round)
+
+                if (round === 10) {
+                    playGame = false;
+                    averageReactionTime()
+                    console.log(round)
+		            gameEl!.style.display = 'none'
+		            lobbyEl!.style.display = 'block'
+
+                } else if (round < 10){
+                    
+                    setTimeout(() => {
+                        round++;
+
+                    }, 300);
+
+                    console.log(round)
+
+                    playGame = false;
+                
+                }
+
             }
-        })
-
-        if (i <= 10) {
-
-                playGame = true
-                console.log("play status", playGame, "round", i)
-                return
-                
-        } else if(i > 10){
-
-                playGame = false
-                console.log("play status", playGame, "round", i)
-                
-                averageReactionTime()
-                return playGame
-
-
-         }
-    }
+        }
+    })
 })
+
+// Thinking we can connect the round-variable to the reaction time so the timer will restart for each round.
