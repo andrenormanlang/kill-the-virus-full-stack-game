@@ -16,4 +16,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	socket.on('disconnect', () => {
 		debug('✌🏻 A user disconnected', socket.id)
 	})
+
+	socket.emit('hello')
 }

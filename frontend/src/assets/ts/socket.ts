@@ -8,8 +8,8 @@ socket.on('connect', () => {
 	console.log('hej')
 })
 
-socket.on('createGameRoom', () => {
-	console.log('creating game room')
+socket.on('hello', () => {
+	console.log('Server saying hello')
 })
 
 export default socket

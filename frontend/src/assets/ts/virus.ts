@@ -14,6 +14,8 @@ if (joinGameBtn && lobbyEl && gameEl) {
 		// Show the game element
 		gameEl.style.display = 'block'
 
+		renderGameScreen()
+		
 		displayVirus()
 	})
 }
@@ -31,8 +33,6 @@ function renderGameScreen() {
 	const gameScreen = document.querySelector('.gameScreen');
 	gameScreen!.innerHTML = cells;
 }
-
-renderGameScreen()
 
 let virusTimeout: number;
 let round = 0
