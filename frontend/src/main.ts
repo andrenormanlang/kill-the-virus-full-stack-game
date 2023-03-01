@@ -21,6 +21,10 @@ socket.on('hello', () => {
 	console.log('Server saying hello')
 })
 
+socket.on('userJoinedGame', (username) => {
+	console.log(username, 'has joined the game')
+})
+
 usernameFormEl.addEventListener('submit', e => {
 	e.preventDefault();
 
@@ -33,7 +37,7 @@ usernameFormEl.addEventListener('submit', e => {
 	if (!username) return
 
 	// socket.emit('userJoinedLobby', username)
-	socket.emit('userJoinedGame', username)
+	socket.emit('userJoin', username)
 
 	socket.on('showVirus', (row, column, delay) => {
 		// gridCol and gridRow will be calculated in backend and sent here

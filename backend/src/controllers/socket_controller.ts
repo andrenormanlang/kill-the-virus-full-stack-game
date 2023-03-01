@@ -6,18 +6,19 @@ import Debug from 'debug'
 import { Socket } from 'socket.io'
 import { createUser } from '../services/user_service'
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/socket_types'
+import { GameRoom } from '@prisma/client'
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
 
 // Handle the user connecting
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
-	debug('🙋🏼 A user connected -', socket.id)
+	// debug('🙋🏼 A user connected -', socket.id)
 
-	// Handle user disconnecting
-	socket.on('disconnect', () => {
-		debug('✌🏻 A user disconnected', socket.id)
-	})
+	// // Handle user disconnecting
+	// socket.on('disconnect', () => {
+	// 	debug('✌🏻 A user disconnected', socket.id)
+	// })
 
 	socket.emit('hello')
 
@@ -25,36 +26,42 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	// 	debug('Welcome to the lobby', username)
 	// })
 
-	let connecterUsers = 0
+	let availableRoom: GameRoom | null
 
-	socket.on('userJoinedGame', async (username) => {
+	socket.on('userJoin', async (username) => {
 		debug(username, 'joined a game', socket.id)
 
 		try {
-			const gameRoom = await prisma.gameRoom.create({
-				data: {}
-			})
-			debug(gameRoom)
+			
 
-			const user = await createUser(username, gameRoom.id)
-			debug(user)
+			if (!availableRoom) {
+				// Create a new gameRoom
+				const gameRoom = await prisma.gameRoom.create({ data: {} })
+				debug('New gameRoom:', gameRoom)
 
-			connecterUsers++
+				// Create the user with that gameRoomId
+				const user = await createUser(username, gameRoom.id)
 
-			if (connecterUsers === 2) {
-				debug('GAME STARTED!')
+				// Get all users with that gameRoomId
+				const users = await prisma.user.findMany({ where: { gameRoomId: gameRoom.id } })
+				debug(users)
 
-				connecterUsers = 0
+				availableRoom = gameRoom
+				// socket.broadcast.emit('roomAvailable', availableRoom)
 			}
 			else {
-				debug('Waiting for player...')
+				// const gameRoom = await prisma.gameRoom.findFirst()
+				// debug('Existing gameRoom:', gameRoom)
 			}
+
+			socket.broadcast.emit('userJoinedGame', username)
+			// socket.join(availableRoom.id)
+			// socket.broadcast.to(availableRoom.id).emit('userJoinedGame', username)
 
 		}
 		catch (err) {
 			debug('ERROR!')
 		}
-
 
 		const row = Math.ceil(Math.random() * 10)
 		const column = Math.ceil(Math.random() * 10)
