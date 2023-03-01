@@ -25,6 +25,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	// 	debug('Welcome to the lobby', username)
 	// })
 
+	let connecterUsers = 0
+
 	socket.on('userJoinedGame', async (username) => {
 		debug(username, 'joined a game', socket.id)
 
@@ -36,6 +38,17 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 			const user = await createUser(username, gameRoom.id)
 			debug(user)
+
+			connecterUsers++
+
+			if (connecterUsers === 2) {
+				debug('GAME STARTED!')
+
+				connecterUsers = 0
+			}
+			else {
+				debug('Waiting for player...')
+			}
 
 		}
 		catch (err) {
