@@ -8,13 +8,14 @@ datasource db {
 }
 
 model GameRoom {
-    id    String @id @default(auto()) @map("_id") @db.ObjectId
-    users User[]
+    id        String @id @default(auto()) @map("_id") @db.ObjectId
+    userCount Int
+    users     User[]
 }
 
 model User {
-    id         String    @id @default(auto()) @map("_id") @db.ObjectId
+    id         String   @id @map("_id")
     name       String
-    gameRoom   GameRoom? @relation(fields: [gameRoomId], references: [id])
-    gameRoomId String?   @db.ObjectId
+    gameRoom   GameRoom @relation(fields: [gameRoomId], references: [id])
+    gameRoomId String   @db.ObjectId
 }
