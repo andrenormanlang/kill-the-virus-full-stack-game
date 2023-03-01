@@ -32,43 +32,44 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 		debug(username, 'joined a game', socket.id)
 
 		try {
+
 			
 
-			if (!availableRoom) {
+			// Find a waitingRoom with 1 user
+			const waitingRoom = await  prisma.gameRoom.findFirst({
+				include: {
+					_count: {
+						select: {
+							users: true
+						}
+					}
+				}
+			})
+			debug(waitingRoom?._count.users)
+
+			if (!waitingRoom || waitingRoom._count.users !== 1) {
 				// Create a new gameRoom
 				const gameRoom = await prisma.gameRoom.create({ data: {} })
-				// debug('New gameRoom:', gameRoom)
 
 				// Create the user with that gameRoomId
 				const user = await createUser(username, gameRoom.id)
 
-				// Get all users with that gameRoomId
-				const users = await prisma.user.findMany({ where: { gameRoomId: gameRoom.id } })
-				// debug(users)
-
-				const room = await  prisma.gameRoom.findUnique({
-					where: { id: gameRoom.id },
-					include: {
-						users: true,
-						_count: {
-							
-						}
-					}
-				})
-				debug('Room with users:', room)
-
-				availableRoom = gameRoom
-				// socket.broadcast.emit('roomAvailable', availableRoom)
+				// // Get all users with that gameRoomId
+				// const users = await prisma.user.findMany({ where: { gameRoomId: gameRoom.id } })
+				// // debug(users)
 			}
-			else {
-				// const gameRoom = await prisma.gameRoom.findFirst()
-				// debug('Existing gameRoom:', gameRoom)
+			else if (waitingRoom._count.users = 1) {
+				// Create the user with that gameRoomId
+				const user = await createUser(username, waitingRoom.id)
 			}
+			
+
+			// availableRoom = gameRoom
+			// socket.broadcast.emit('roomAvailable', availableRoom)
 
 			socket.broadcast.emit('userJoinedGame', username)
 			// socket.join(availableRoom.id)
 			// socket.broadcast.to(availableRoom.id).emit('userJoinedGame', username)
-
 		}
 		catch (err) {
 			debug('ERROR!')
