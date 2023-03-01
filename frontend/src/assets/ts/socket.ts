@@ -39,7 +39,7 @@ usernameFormEl.addEventListener('submit', e => {
 
 		setTimeout(() => {
 			(document.querySelector('#gameScreen') as HTMLDivElement).innerHTML = `
-				<div class="cell" style="grid-row: ${gridRow}; grid-column: ${gridCol};">🦠</div>
+				<div class="cell" style="grid-row: ${gridRow}; grid-column: ${gridCol};">🤩</div>
 			`
 		}, delay);
 	})
