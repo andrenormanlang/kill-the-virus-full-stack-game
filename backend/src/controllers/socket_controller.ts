@@ -37,14 +37,25 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			if (!availableRoom) {
 				// Create a new gameRoom
 				const gameRoom = await prisma.gameRoom.create({ data: {} })
-				debug('New gameRoom:', gameRoom)
+				// debug('New gameRoom:', gameRoom)
 
 				// Create the user with that gameRoomId
 				const user = await createUser(username, gameRoom.id)
 
 				// Get all users with that gameRoomId
 				const users = await prisma.user.findMany({ where: { gameRoomId: gameRoom.id } })
-				debug(users)
+				// debug(users)
+
+				const room = await  prisma.gameRoom.findUnique({
+					where: { id: gameRoom.id },
+					include: {
+						users: true,
+						_count: {
+							
+						}
+					}
+				})
+				debug('Room with users:', room)
 
 				availableRoom = gameRoom
 				// socket.broadcast.emit('roomAvailable', availableRoom)
