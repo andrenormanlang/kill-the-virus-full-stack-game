@@ -70,6 +70,12 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 					where: { id: existingRoom.id },
 					data: { userCount: 2 }
 				})
+
+				const row = Math.ceil(Math.random() * 10)
+				const column = Math.ceil(Math.random() * 10)
+				const delay = Math.ceil(Math.random() * 5) * 1000
+				
+				socket.emit('showVirus', row, column, delay)
 			}
 			
 
@@ -83,12 +89,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 		catch (err) {
 			debug('ERROR!')
 		}
-
-		const row = Math.ceil(Math.random() * 10)
-		const column = Math.ceil(Math.random() * 10)
-		const delay = Math.ceil(Math.random() * 5) * 1000
-		
-		socket.emit('showVirus', row, column, delay)
 	})
 	
 

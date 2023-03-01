@@ -28,10 +28,6 @@ socket.on('userJoinedGame', (username) => {
 usernameFormEl.addEventListener('submit', e => {
 	e.preventDefault();
 
-	// Hide lobby and show game
-	(document.querySelector('#lobby') as HTMLDivElement).style.display = 'none';
-	(document.querySelector('#game') as HTMLDivElement).style.display = 'block'
-
 	// Get username
 	username = (usernameFormEl.querySelector('#username-input') as HTMLInputElement).value.trim()
 	if (!username) return
@@ -40,6 +36,10 @@ usernameFormEl.addEventListener('submit', e => {
 	socket.emit('userJoin', username)
 
 	socket.on('showVirus', (row, column, delay) => {
+		// Hide lobby and show game
+		(document.querySelector('#lobby') as HTMLDivElement).style.display = 'none';
+		(document.querySelector('#game') as HTMLDivElement).style.display = 'block'
+
 		// gridCol and gridRow will be calculated in backend and sent here
 		const gridRow = row
 		const gridCol = column;
