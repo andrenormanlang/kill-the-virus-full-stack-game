@@ -35,32 +35,41 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 			
 
-			// Find a waitingRoom with 1 user
-			const waitingRoom = await  prisma.gameRoom.findFirst({
-				include: {
-					_count: {
-						select: {
-							users: true
-						}
-					}
-				}
+			// Find an existing room with 1 user
+			const existingRoom = await  prisma.gameRoom.findFirst({
+				where: {
+					userCount: 1
+				},
+				// include: {
+				// 	userCount: {
+				// 		select: {
+				// 			users: true
+				// 		}
+				// 	}
+				// }
 			})
-			debug(waitingRoom?._count.users)
+			debug(existingRoom?.userCount)
 
-			if (!waitingRoom || waitingRoom._count.users !== 1) {
+			if (!existingRoom || existingRoom.userCount !== 1) {
 				// Create a new gameRoom
-				const gameRoom = await prisma.gameRoom.create({ data: {} })
+				const gameRoom = await prisma.gameRoom.create({ data: { userCount: 1 } })
 
 				// Create the user with that gameRoomId
-				const user = await createUser(username, gameRoom.id)
+				const user = await createUser(socket.id, username, gameRoom.id)
 
 				// // Get all users with that gameRoomId
 				// const users = await prisma.user.findMany({ where: { gameRoomId: gameRoom.id } })
 				// // debug(users)
 			}
-			else if (waitingRoom._count.users = 1) {
+			else if (existingRoom.userCount = 1) {
+				debug(existingRoom.id, username)
 				// Create the user with that gameRoomId
-				const user = await createUser(username, waitingRoom.id)
+				const user = await createUser(socket.id, username, existingRoom.id)
+				
+				await prisma.gameRoom.update({
+					where: { id: existingRoom.id },
+					data: { userCount: 2 }
+				})
 			}
 			
 
