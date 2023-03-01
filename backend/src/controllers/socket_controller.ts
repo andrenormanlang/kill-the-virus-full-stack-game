@@ -1,8 +1,10 @@
 /**
  * Socket Controller
  */
+import prisma from '../prisma'
 import Debug from 'debug'
 import { Socket } from 'socket.io'
+import { createUser } from '../services/user_service'
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/socket_types'
 
 // Create a new debug instance
@@ -23,8 +25,23 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	// 	debug('Welcome to the lobby', username)
 	// })
 
-	socket.on('userJoinedGame', (username) => {
-		debug(username, 'joined a game')
+	socket.on('userJoinedGame', async (username) => {
+		debug(username, 'joined a game', socket.id)
+
+		try {
+			const gameRoom = await prisma.gameRoom.create({
+				data: {}
+			})
+			debug(gameRoom)
+
+			const user = await createUser(username, gameRoom.id)
+			debug(user)
+
+		}
+		catch (err) {
+			debug('ERROR!')
+		}
+
 
 		const row = Math.ceil(Math.random() * 10)
 		const column = Math.ceil(Math.random() * 10)
