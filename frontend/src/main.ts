@@ -1,5 +1,4 @@
 import './assets/scss/style.scss'
-import './assets/ts/virus'
 import './assets/ts/rounds'
 
 import { io, Socket } from 'socket.io-client'
