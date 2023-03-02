@@ -6,7 +6,7 @@ import Debug from 'debug'
 import { Socket } from 'socket.io'
 import { createUser } from '../services/user_service'
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/socket_types'
-import { GameRoom } from '@prisma/client'
+import { io } from '../../server'
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
@@ -42,6 +42,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 					gameRoomId: gameRoom.id,
 				})
 
+				socket.join(gameRoom.id)
 				debug(user.name, 'created and joined a game:', gameRoom.id)
 			}
 
@@ -57,6 +58,9 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 					data: { userCount: 2 }
 				})
 
+				
+
+				socket.join(existingRoom.id)
 				debug(user.name, 'joined a game:', existingRoom.id)
 
 				// Calculate where and when the virus will appear
@@ -64,7 +68,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 				const column = Math.ceil(Math.random() * 10)
 				const delay = Math.ceil(Math.random() * 5) * 1000
 				
-				socket.emit('showVirus', row, column, delay)
+				io.to(existingRoom.id).emit('showVirus', row, column, delay)
 			}
 		}
 		catch (err) {

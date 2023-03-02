@@ -11,6 +11,9 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOS
 const usernameFormEl = document.querySelector('#username-form') as HTMLFormElement
 const usernameBtnEl = document.querySelector('#enter') as HTMLFormElement
 
+// Div
+const spinnerEl = document.querySelector('#spinner') as HTMLFormElement
+
 // User details
 let username: string | null = null
 
@@ -30,6 +33,8 @@ usernameFormEl.addEventListener('submit', e => {
 	e.preventDefault();
 
 	usernameBtnEl.setAttribute('disabled', 'disabled')
+
+	spinnerEl.classList.remove('hide')
 	
 	// Get username
 	username = (usernameFormEl.querySelector('#username-input') as HTMLInputElement).value.trim()
@@ -39,9 +44,11 @@ usernameFormEl.addEventListener('submit', e => {
 	socket.emit('userJoin', username)
 
 	socket.on('showVirus', (row, column, delay) => {
+		console.log("LET'S GO BRO!");
 		// Hide lobby and show game
 		(document.querySelector('#lobby') as HTMLDivElement).style.display = 'none';
 		(document.querySelector('#game') as HTMLDivElement).style.display = 'block'
+		spinnerEl.classList.remove('hide')
 
 		// gridCol and gridRow will be calculated in backend and sent here
 		const gridRow = row

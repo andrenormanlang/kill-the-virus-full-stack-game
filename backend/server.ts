@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3000
  * Create HTTP and Socket.Io server
  */
 const httpServer = http.createServer(app)
-const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>(httpServer, {
+export const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>(httpServer, {
 	cors: {
 		origin: '*',
 		credentials: true,
