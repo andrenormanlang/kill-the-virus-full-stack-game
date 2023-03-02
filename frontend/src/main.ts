@@ -43,12 +43,31 @@ usernameFormEl.addEventListener('submit', e => {
 	if (!username) return
 
 	let timer: number
+	// variable to start the loop
+	let playGame = false
+	// array for all 10 reaction times
+	let reactionTime:any = []
+	// variable for reaction time (1 round)
+	let scoreRound = 0
+
+	let round = 0
 
 	// socket.emit('userJoinedLobby', username)
 	socket.emit('userJoin', username)
 
 	socket.on('showVirus', (row, column, delay) => {
-		console.log("LET'S GO BRO!");
+		round++;
+
+		if (round === 11) {
+			playGame = false;
+			averageReactionTime()
+			gameEl.style.display = 'none'
+			lobbyEl.style.display = 'block'
+			return
+		}
+		
+		console.log('Round:', round)
+
 		// Hide lobby and show game
 		lobbyEl.style.display = 'none';
 		gameEl.style.display = 'block'
@@ -65,15 +84,6 @@ usernameFormEl.addEventListener('submit', e => {
 			timer = Date.now() / 1000
 		}, delay);		
 	})
-
-	// variable to start the loop
-	let playGame = false
-	// array for all 10 reaction times
-	let reactionTime:any = []
-	// variable for reaction time (1 round)
-	let scoreRound = 0
-
-	let round = 1
 	
 	// calculates the average reactionTime for all rounds
 	const averageReactionTime = () => {
@@ -93,21 +103,13 @@ usernameFormEl.addEventListener('submit', e => {
 
 		if (!target.classList.contains('virus')) return
 
-		if (round === 10) {
-			playGame = false;
-			averageReactionTime()
-			gameEl.style.display = 'none'
-			lobbyEl.style.display = 'block'
+		socket.emit('clickVirus');
+		(document.querySelector('#virus') as HTMLDivElement).remove()
 
-		} else if (round < 10){
-			round++
-			console.log('Round:', round)
+		const timeTakenToClick = Number((Date.now() / 1000 - timer).toFixed(3))
+		console.log("It took", timeTakenToClick, "seconds")
 
-			const timeTakenToClick = Number((Date.now() / 1000 - timer).toFixed(3))
-			console.log("It took", timeTakenToClick, "seconds")
-
-			scoreRound = 1 //hårdkodat atm, add reaction time and then push to reactionTime array
-		}
+		scoreRound = 1 //hårdkodat atm, add reaction time and then push to reactionTime array
 	})
 })
 

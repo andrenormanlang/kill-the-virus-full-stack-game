@@ -11,6 +11,17 @@ import { io } from '../../server'
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
 
+const showVirus = (roomId: string) => {	
+	// Calculate where and when the virus will appear
+	const row = Math.ceil(Math.random() * 10)
+	const column = Math.ceil(Math.random() * 10)
+	const delay = Math.ceil(Math.random() * 5) * 1000
+
+	debug("Sending virus %s %s %s to %s", row, column, delay, roomId)
+
+	io.to(roomId).emit('showVirus', row, column, delay)
+}
+
 // Handle the user connecting
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
 	// debug('🙋🏼 A user connected -', socket.id)
@@ -63,12 +74,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 				socket.join(existingRoom.id)
 				debug(user.name, 'joined a game:', existingRoom.id)
 
-				// Calculate where and when the virus will appear
-				const row = Math.ceil(Math.random() * 10)
-				const column = Math.ceil(Math.random() * 10)
-				const delay = Math.ceil(Math.random() * 5) * 1000
-				
-				io.to(existingRoom.id).emit('showVirus', row, column, delay)
+				showVirus(existingRoom.id)
 			}
 		}
 		catch (err) {
@@ -77,7 +83,10 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	})
 	
 
-
+	socket.on('clickVirus', async () => {
+		const user = await prisma.user.findUnique({ where: { id: socket.id } })
+		showVirus(user!.gameRoomId)
+	})
 
 
 

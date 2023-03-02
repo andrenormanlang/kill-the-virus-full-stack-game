@@ -17,6 +17,7 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
 	// userJoinedLobby: (username: string) => void
 	userJoin: (username: string) => void
+	clickVirus: () => void
 }
 
 export interface InterServerEvents { }
