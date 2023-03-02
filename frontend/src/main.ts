@@ -9,6 +9,7 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOS
 
 // Forms
 const usernameFormEl = document.querySelector('#username-form') as HTMLFormElement
+const usernameBtnEl = document.querySelector('#username-btn') as HTMLFormElement
 
 // User details
 let username: string | null = null
@@ -27,6 +28,8 @@ socket.on('userJoinedGame', (username) => {
 
 usernameFormEl.addEventListener('submit', e => {
 	e.preventDefault();
+
+	usernameBtnEl.setAttribute('disabled', 'disabled')
 
 	// Get username
 	username = (usernameFormEl.querySelector('#username-input') as HTMLInputElement).value.trim()

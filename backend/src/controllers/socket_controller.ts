@@ -26,8 +26,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	// 	debug('Welcome to the lobby', username)
 	// })
 
-	let availableRoom: GameRoom | null
-
 	socket.on('userJoin', async (username) => {
 		try {
 			// Find an existing room with only 1 user
