@@ -29,62 +29,45 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	let availableRoom: GameRoom | null
 
 	socket.on('userJoin', async (username) => {
-		debug(username, 'joined a game', socket.id)
-
 		try {
-
-			
-
-			// Find an existing room with 1 user
-			const existingRoom = await  prisma.gameRoom.findFirst({
-				where: {
-					userCount: 1
-				},
-				// include: {
-				// 	userCount: {
-				// 		select: {
-				// 			users: true
-				// 		}
-				// 	}
-				// }
-			})
-			debug(existingRoom?.userCount)
+			// Find an existing room with only 1 user
+			const existingRoom = await prisma.gameRoom.findFirst({ where: { userCount: 1 } })
 
 			if (!existingRoom || existingRoom.userCount !== 1) {
 				// Create a new gameRoom
 				const gameRoom = await prisma.gameRoom.create({ data: { userCount: 1 } })
 
-				// Create the user with that gameRoomId
-				const user = await createUser(socket.id, username, gameRoom.id)
+				// Create a user and connect with newly created gameRoom
+				const user = await createUser({
+					id: socket.id,
+					name: username,
+					gameRoomId: gameRoom.id,
+				})
 
-				// // Get all users with that gameRoomId
-				// const users = await prisma.user.findMany({ where: { gameRoomId: gameRoom.id } })
-				// // debug(users)
+				debug(user.name, 'created and joined a game:', gameRoom.id)
 			}
+
 			else if (existingRoom.userCount = 1) {
-				debug(existingRoom.id, username)
-				// Create the user with that gameRoomId
-				const user = await createUser(socket.id, username, existingRoom.id)
+				const user = await createUser({
+					id: socket.id,
+					name: username,
+					gameRoomId: existingRoom.id,
+				})
 				
 				await prisma.gameRoom.update({
 					where: { id: existingRoom.id },
 					data: { userCount: 2 }
 				})
 
+				debug(user.name, 'joined a game:', existingRoom.id)
+
+				// Calculate where and when the virus will appear
 				const row = Math.ceil(Math.random() * 10)
 				const column = Math.ceil(Math.random() * 10)
 				const delay = Math.ceil(Math.random() * 5) * 1000
 				
 				socket.emit('showVirus', row, column, delay)
 			}
-			
-
-			// availableRoom = gameRoom
-			// socket.broadcast.emit('roomAvailable', availableRoom)
-
-			socket.broadcast.emit('userJoinedGame', username)
-			// socket.join(availableRoom.id)
-			// socket.broadcast.to(availableRoom.id).emit('userJoinedGame', username)
 		}
 		catch (err) {
 			debug('ERROR!')
