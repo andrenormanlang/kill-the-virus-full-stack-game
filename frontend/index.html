@@ -1,59 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="/src/assets/scss/style.scss" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&display=swap"
+			rel="stylesheet"
+		/>
+		<title>KTV</title>
+	</head>
 
-<head>
-	<meta charset="UTF-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<link rel="stylesheet" href="/src/assets/scss/style.scss" />
-	<title>KTV</title>
-</head>
-
-<body>
-	<div id="lobby">
-		<header>
-			<h1>Game Lobby</h1>
-			<div class="stats">
-				<p>Number of games: <span id="numGames"></span></p>
-				<p>High score: <span id="highScore"></span></p>
+	<body>
+		<div id="lobby">
+			<header>
+				<h1>WHACK-A-VIRUS</h1>
+				<div class="stats">
+					<p>Number of games: <span id="numGames"></span></p>
+					<p>High score: <span id="highScore"></span></p>
+				</div>
+			</header>
+			<main>
+				<!-- When waiting for another player -->
+				<form id="username-form">
+					<input
+						id="username-input"
+						type="text"
+						required
+						placeholder="Enter username"
+					/>
+					<button class="enter-btn" id="enter" type="submit">
+						Play Game
+					</button>
+				</form>
+				<div>
+					<div class="loader">
+						<span style="--i: 0"></span>
+						<span style="--i: 1"></span>
+						<span style="--i: 2"></span>
+						<span style="--i: 3"></span>
+						<span style="--i: 4"></span>
+						<span style="--i: 5"></span>
+						<span style="--i: 6"></span>
+						<span style="--i: 7"></span>
+					</div>
+				</div>
+				<h2>Current games:</h2>
+				<ul id="gameList"></ul>
+				<h2>Top 10 reaction times:</h2>
+				<ul id="reactionList"></ul>
+			</main>
+		</div>
+		<div id="game">
+			<div class="virusHeader"><h2>Kill The Virus!</h2></div>
+			<div id="gameboard">
+				<div id="gameScreen"></div>
 			</div>
-		</header>
-		<main>
-			<form id="username-form">
-				<input id="username-input" type="text" required placeholder="Enter username" />
-				<button class="enter-btn" id="enter" type="submit">Play Game</button>
-			</form>
-			<h2>Current games:</h2>
-			<ul id="gameList"></ul>
-			<h2>Top 10 reaction times:</h2>
-			<ul id="reactionList"></ul>
-		</main>
-	</div>
-	<div id="game">
-		<div id="gameboard">
-			<div class="virusHeader">Kill The Virus!</div>
-
-			<div id="gameScreen">
-
+			<div id="scoreboard">
+				<div class="scoreHeader">SCOREBOARD</div>
+				<div class="currentScore">3 - 1</div>
+				<div class="scoreWrapper">
+					<div class="you">
+						<div>You:</div>
+						<div>00:01.532</div>
+					</div>
+					<div class="opponent">
+						<div>Opponent:</div>
+						<div>00:01.532</div>
+					</div>
+				</div>
 			</div>
 		</div>
-		<div id="scoreboard">
-			<div class="scoreHeader">ScoreBoard</div>
-			<div class="currentScore">3 - 1</div>
-			<div class="scoreWrapper">
-				<div class="you">
-					<div>You: </div>
-					<div>00:01.532</div>
-				</div>
-				<div class="opponent">
-					<div>Opponent: </div>
-					<div>00:01.532</div>
-				</div>
-			</div>
-		</div>
-		<footer class="footer"></footer>
-	</div>
-	<script type="module" src="/src/main.ts"></script>
-</body>
-
+		<footer class="footer"><p>Grupp 6 API-utveckling</p></footer>
+		<script type="module" src="/src/main.ts"></script>
+	</body>
 </html>

@@ -2,8 +2,140 @@ body {
 	font-family: Arial, sans-serif;
 	margin: 0;
 	padding: 0;
-	background-color: #444;
-  }
+	background-color: #111;
+	
+}
+
+header {
+	background-color: #222;
+	color: #fff;
+	padding: 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: #32cd32 solid 2px;
+}
+
+h1 {
+	font-family: 'Orbitron', sans-serif;
+	color: #32cd32;
+}
+
+h2 {
+	font-family: 'Orbitron', sans-serif;
+	color: #fff;
+	
+}
+
+main {
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+	flex-direction: column;
+	margin: 50px;
+}
+
+#username-form{
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+	flex-direction: column;
+	width: 300px;
+	height: 300px;
+}
+
+#username-input{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #111;
+	border: #32cd32 solid 2px;
+	height: 50px;
+	width: 300px;
+	padding: 10px;
+	color: #32cd32;
+	font-family: 'Orbitron', sans-serif;
+}
+
+#enter{
+	background-color: #32cd32;
+	border: #111 2px solid;
+	color: #111;
+	font-family: 'Orbitron', sans-serif;
+	height: 50px;
+	width: 200px;
+	transition: 0.5s;
+}
+
+#enter:hover{
+	background-color: #111;
+	border: #32cd32 3px solid;
+	color: #32cd32;
+}
+
+#lobby > header {
+	font-family: 'Orbitron', sans-serif;
+	background-color: #111;
+}
+
+.loader {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	height: 100px;
+	width: 100px;
+}
+
+.loader > span {
+	position:absolute;
+	width: 9px;
+	height: 9px;
+	background: #32cd32;
+	border: #111 0.5px solid;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	animation: animate 4s linear infinite;
+	animation-delay: calc(-0.5s*var(--i));
+}
+
+@keyframes animate {
+	0%{
+		top: 0;
+		left: 20px;
+		transform: scaleY(1);
+	}
+	2%{
+		top: 0;
+		left: 20px;
+		transform: scaleY(0.4);
+
+	}
+	10%{
+		top: 0;
+		left: 10px;
+		transform: scaleY(1);
+
+	}
+	40%{
+		top: 0;
+		left: -20px;
+
+	}
+	60%{
+		top: -40px;
+		left: -20px;
+	}
+	85%{
+		top: -40px;
+		left: 20px;
+	}
+	100%{
+		top: 0;
+		left: 20px;
+	}
+}
 
 .username {
 	display: block;
@@ -12,15 +144,6 @@ body {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-}
-
-header {
-	background-color: #333;
-	color: #fff;
-	padding: 20px;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
 }
   
 .stats {
@@ -42,28 +165,42 @@ main {
 #game {
 	display: none;
 	height: 100vh;
+	background-color: #111;
+
 }
   
 #gameboard {
 	width: 80%;
 	height: 100%;
 	float: left;
-	background-color: #eee;
-}
-
-.virusHeader {
-	background: #333;
-	color: #fff;
-	padding-top: 0%;
-	height: 10vh;
+	background-color: #111;
 	display: flex;
+	justify-content: center;
 	align-items: center;
 }
 
+.virusHeader {
+	background: #111;
+	border-bottom: #32cd32 1px solid;
+	padding-top: 0%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-family: 'Orbitron', sans-serif;
+	height: 100px;
+	width: 100%;
+}
+
+.virusHeader >h2 {
+	color: #32cd32;
+	padding: 0 20px;
+
+}
+
 #gameScreen {
- 	width: 100%;
-	height: 80vh;
-	background-color: #888;
+ 	width: 80%;
+	height: 100vh;
+	background-color: #222;
 	display: grid;
 	grid-template-columns: repeat(10, 1fr);
 	grid-template-rows: repeat(10, 1fr);
@@ -73,18 +210,21 @@ main {
 }
   
 #scoreboard {
-	width: 20%;
-	height: 100%;
 	float: left;
-	background-color: #ccc;
+	width: 300px;
+	background-color: #111;
+	color: #fff;
+	font-family: 'Orbitron', sans-serif;
+	border-left: #32cd32 2px solid;
 }
   
 .scoreHeader {
 	display: flex;
 	justify-content: center;
+	align-items: center;
 	width: 100%;
-	height: 50px;
-	background: #333;
+	height: 100px;
+	background: #111;
 	color: #fff;
 }
 
@@ -95,20 +235,24 @@ main {
 	width: 100%;
 	height: 200px;
 	font-size: xx-large;
+
 }
 
 .you {
 	display: flex;
 	justify-content: center;
 	width: 100%;
-	height: 200px;
+	height: 100px;
+	align-items: center;
+
 }
 
 .opponent {
 	display: flex;
 	justify-content: center;
 	width: 100%;
-	height: 200px;
+	height: 100px;
+
 }
 
 .footer {
@@ -116,7 +260,12 @@ main {
 	bottom: 0;
 	width: 100%;
 	height: 10vh;
-	background-color: #333;
+	background-color: #111;
+	border-top: #32cd32 0.5px solid;
+	color: #fff;
+	font-family: 'Orbitron', sans-serif;
+	text-align: center;
+
 }
 
 .cell {
