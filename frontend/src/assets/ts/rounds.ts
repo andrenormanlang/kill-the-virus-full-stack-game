@@ -3,7 +3,7 @@ export {}
 // variable to start the loop
 let playGame = false
 // array for all 10 reaction times
-let reactionTime:any = []
+let reactionTime: number[]
 // variable for reaction time (1 round)
 let scoreRound = 0
 
@@ -37,14 +37,14 @@ joinGameEl?.addEventListener("click", (e) => {
         while (playGame) {
             if (e.target.classList.contains('cell-virus')) {
                 round++
+				console.log('Round:', round)
+
                 scoreRound = 1//hårdkodat atm, add reaction time and then push to reactionTime array
                 
-                console.log(round)
 
                 if (round === 10) {
                     playGame = false;
                     averageReactionTime()
-                    console.log(round)
 		            gameEl!.style.display = 'none'
 		            lobbyEl!.style.display = 'block'
 
@@ -54,8 +54,6 @@ joinGameEl?.addEventListener("click", (e) => {
                         round++;
 
                     }, 300);
-
-                    console.log(round)
 
                     playGame = false;
                 
