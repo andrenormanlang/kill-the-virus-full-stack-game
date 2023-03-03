@@ -11,6 +11,7 @@ export interface ServerToClientEvents {
 	showVirus: (row: number, column: number, delay: number) => void
 	userJoinedGame: (username: string) => void
 	roomAvailable: (room: GameRoom) => void
+	endGame: () => void
 }
 
 // Events emitted by the client to the server

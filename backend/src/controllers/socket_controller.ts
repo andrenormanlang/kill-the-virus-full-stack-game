@@ -85,7 +85,15 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 	socket.on('clickVirus', async () => {
 		const user = await prisma.user.findUnique({ where: { id: socket.id } })
-		showVirus(user!.gameRoomId)
+		if (!user) return
+		let round = 1
+
+		if (round > 10) {
+			socket.emit('endGame')
+			return
+		}
+
+		showVirus(user.gameRoomId)
 	})
 
 
