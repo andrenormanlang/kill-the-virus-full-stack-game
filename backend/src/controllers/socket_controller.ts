@@ -27,8 +27,22 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	debug('🙋🏼 A user connected -', socket.id)
 
 	// Handle user disconnecting
-	socket.on('disconnect', () => {
+	socket.on('disconnect', async () => {
 		debug('✌🏻 A user disconnected', socket.id)
+		const user = await prisma.user.findUnique({
+			where: {
+				id: socket.id
+			}
+		})
+
+		if (!user) return
+
+		const deleteRoom = await prisma.gameRoom.delete({
+			where: {
+				id: user?.gameRoomId
+			}
+		})
+		console.log(deleteRoom)
 	})
 
 	let round = 0
@@ -87,7 +101,12 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			if (!gameRoom) return
 
 			round++
-			if (round > 10) return io.to(gameRoom.id).emit('endGame')
+			if (round > 10) {
+
+				const times = await prisma.reactionTime.findMany({ where: { id: user.gameRoomId } })
+				console.log(times)
+				return io.to(gameRoom.id).emit('endGame')
+			}
 
 			const newReactionTime = await prisma.reactionTime.create({
 				data: {
@@ -105,13 +124,15 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 			if (updatedGameRoom.clickedUsers.length >= updatedGameRoom.userCount) {
 				// All users have clicked, start the next round
-				showVirus(user.gameRoomId, round)
+				// showVirus(user.gameRoomId, round)
 
 				// Reset clickedUsers
 				await prisma.gameRoom.update({
 					where: { id: gameRoom.id },
 					data: { clickedUsers: [] }
 				})
+
+				showVirus(user.gameRoomId, round)
 			}
 		}
 		catch (err) {
