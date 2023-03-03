@@ -103,11 +103,12 @@ usernameFormEl.addEventListener('submit', e => {
 
 		if (!target.classList.contains('virus')) return
 
-		socket.emit('clickVirus');
 		(document.querySelector('#virus') as HTMLDivElement).remove()
 
 		const timeTakenToClick = Number((Date.now() / 1000 - timer).toFixed(3))
 		console.log("It took", timeTakenToClick, "seconds")
+
+		socket.emit('clickVirus', timeTakenToClick);
 
 		scoreRound = 1 //hårdkodat atm, add reaction time and then push to reactionTime array
 	})

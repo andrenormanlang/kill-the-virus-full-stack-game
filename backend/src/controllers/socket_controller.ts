@@ -83,8 +83,17 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	})
 
 
-	socket.on('clickVirus', async () => {
+	socket.on('clickVirus', async (timeTakenToClick) => {
 		const user = await prisma.user.findUnique({ where: { id: socket.id } })
+
+		// const newReactionTime = await prisma.reactionTime.create({
+		// 	data: {
+		// 		time: timeTakenToClick,
+		// 		user: {
+		// 			connect: { id: user!.id }
+		// 		}
+		// 	}
+		// })
 
 		const gameRoom = await prisma.gameRoom.findUnique({ where: { id: user!.gameRoomId } })
 

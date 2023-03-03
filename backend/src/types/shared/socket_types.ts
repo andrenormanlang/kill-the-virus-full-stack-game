@@ -3,7 +3,7 @@ import { GameRoom } from "@prisma/client"
 /**
  * Socket Controller
  */
-export {}
+export { }
 
 // Events emitted by the server to the client
 export interface ServerToClientEvents {
@@ -17,7 +17,7 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
 	// userJoinedLobby: (username: string) => void
 	userJoin: (username: string) => void
-	clickVirus: () => void
+	clickVirus: (timeTakenToClick: number) => void
 }
 
 export interface InterServerEvents { }
