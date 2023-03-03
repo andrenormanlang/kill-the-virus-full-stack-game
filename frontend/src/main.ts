@@ -1,7 +1,7 @@
 import './assets/scss/style.scss'
 import './assets/ts/rounds'
 import { io, Socket } from 'socket.io-client'
-import { ClientToServerEvents, ServerToClientEvents} from '@backend/types/shared/socket_types'
+import { ClientToServerEvents, ServerToClientEvents } from '@backend/types/shared/socket_types'
 
 const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOST)
@@ -50,7 +50,7 @@ usernameFormEl.addEventListener('submit', e => {
 
 	usernameBtnEl.setAttribute('disabled', 'disabled')
 	spinnerEl.classList.remove('hide')
-	
+
 	// Get username
 	username = (usernameFormEl.querySelector('#username-input') as HTMLInputElement).value.trim()
 	if (!username) return
@@ -75,7 +75,7 @@ usernameFormEl.addEventListener('submit', e => {
 				<div class="virus" id="virus" style="grid-row: ${gridRow}; grid-column: ${gridCol};">🦠</div>
 			`
 			timer = Date.now() / 1000
-		}, delay);		
+		}, delay);
 	})
 
 	// Eventlistener when clicking the virus
