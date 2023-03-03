@@ -11,15 +11,15 @@ import { io } from '../../server'
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
 
-const showVirus = (roomId: string) => {
+const showVirus = (roomId: string, round: number) => {
 	// Calculate where and when the virus will appear
 	const row = Math.ceil(Math.random() * 10)
 	const column = Math.ceil(Math.random() * 10)
 	const delay = Math.ceil(Math.random() * 5) * 1000
 
-	debug("Sending virus %s %s %s to %s", row, column, delay, roomId)
+	debug("Sending virus: row %s, col %s, delay %s, to %s", row, column, delay / 1000, roomId)
 
-	io.to(roomId).emit('showVirus', row, column, delay)
+	io.to(roomId).emit('showVirus', row, column, delay, round)
 }
 
 // Handle the user connecting
@@ -36,6 +36,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	// socket.on('userJoinedLobby', (username) => {
 	// 	debug('Welcome to the lobby', username)
 	// })
+
+	let round = 0
 
 	socket.on('userJoin', async (username) => {
 		try {
@@ -69,12 +71,11 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 					data: { userCount: 2 }
 				})
 
-
-
 				socket.join(existingRoom.id)
 				debug(user.name, 'joined a game:', existingRoom.id)
 
-				showVirus(existingRoom.id)
+				round++
+				showVirus(existingRoom.id, round)
 			}
 		}
 		catch (err) {
@@ -82,24 +83,28 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 		}
 	})
 
-
 	socket.on('clickVirus', async () => {
 		const user = await prisma.user.findUnique({ where: { id: socket.id } })
+		if (!user) return
 
-		const gameRoom = await prisma.gameRoom.findUnique({ where: { id: user!.gameRoomId } })
+		const gameRoom = await prisma.gameRoom.findUnique({ where: { id: user.gameRoomId } })
+		if (!gameRoom) return
+
+		round++
+		if (round > 10) return io.to(gameRoom.id).emit('endGame')
 
 		const updatedGameRoom = await prisma.gameRoom.update({
-			where: { id: user!.gameRoomId },
-			data: { clickedUsers: [...gameRoom!.clickedUsers, user!.id] }
+			where: { id: user.gameRoomId },
+			data: { clickedUsers: [...gameRoom.clickedUsers, user.id] }
 		})
 
 		if (updatedGameRoom.clickedUsers.length === updatedGameRoom.userCount) {
 			// All users have clicked, start the next round
-			showVirus(user!.gameRoomId)
+			showVirus(user.gameRoomId, round)
 
 			// Reset clickedUsers
 			await prisma.gameRoom.update({
-				where: { id: user!.gameRoomId },
+				where: { id: gameRoom.id },
 				data: { clickedUsers: [] }
 			})
 		}

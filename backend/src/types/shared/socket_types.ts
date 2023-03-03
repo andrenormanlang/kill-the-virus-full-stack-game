@@ -8,7 +8,7 @@ export {}
 // Events emitted by the server to the client
 export interface ServerToClientEvents {
 	hello: () => void
-	showVirus: (row: number, column: number, delay: number) => void
+	showVirus: (row: number, column: number, delay: number, round: number) => void
 	userJoinedGame: (username: string) => void
 	roomAvailable: (room: GameRoom) => void
 	endGame: () => void
@@ -20,5 +20,3 @@ export interface ClientToServerEvents {
 	userJoin: (username: string) => void
 	clickVirus: () => void
 }
-
-export interface InterServerEvents { }

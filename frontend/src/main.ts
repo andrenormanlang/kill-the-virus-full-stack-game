@@ -45,6 +45,10 @@ socket.on('userJoinedGame', (username) => {
 	console.log(username, 'has joined the game')
 })
 
+socket.on('endGame', () => {
+	console.log('Game ended, goodbye.')
+})
+
 usernameFormEl.addEventListener('submit', e => {
 	e.preventDefault();
 
@@ -60,23 +64,22 @@ usernameFormEl.addEventListener('submit', e => {
 
 	let timer: number
 
-	socket.on('showVirus', (row, column, delay) => {
+	socket.on('showVirus', (row, column, delay, round) => {
 		// Hide lobby and show game
 		lobbyEl.style.display = 'none';
 		gameEl.style.display = 'block'
 		spinnerEl.classList.remove('hide')
-
-		// gridCol and gridRow will be calculated in backend and sent here
-		const gridRow = row
-		const gridCol = column;
+		console.log('Round:', round)
 
 		setTimeout(() => {
 			(document.querySelector('#gameScreen') as HTMLDivElement).innerHTML = `
-				<div class="virus" id="virus" style="grid-row: ${gridRow}; grid-column: ${gridCol};">🦠</div>
+				<div class="virus" id="virus" style="grid-row: ${row}; grid-column: ${column};">🦠</div>
 			`
 			timer = Date.now() / 1000
-		}, delay);
+		}, delay)
 	})
+
+
 
 	// Eventlistener when clicking the virus
 	gameScreenEl.addEventListener("click", e => {
