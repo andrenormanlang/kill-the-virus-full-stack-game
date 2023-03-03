@@ -41,31 +41,25 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 	socket.on('userJoin', async (username) => {
 		try {
-			// Create a user and connect with newly created gameRoom
-			const user = await createUser({
-				id: socket.id,
-				name: username,
-				gameRoomId: null,
-			})
-			
-			setInterval(async () => {
-				// Find an existing room with only 1 user
-				const existingRoom = await prisma.gameRoom.findFirst({ where: { userCount: 1 } })
-				if (existingRoom && existingRoom.userCount === 1) {
-					return
-				}
-			}, 500)
-			
+			// Find an existing room with only 1 user
+			const existingRoom = await prisma.gameRoom.findFirst({ where: { userCount: 1 } })
 
 			if (!existingRoom || existingRoom.userCount !== 1) {
 				// Create a new gameRoom
 				const gameRoom = await prisma.gameRoom.create({ data: { userCount: 1 } })
 
+				// Create a user and connect with newly created gameRoom
+				const user = await createUser({
+					id: socket.id,
+					name: username,
+					gameRoomId: gameRoom.id,
+				})
+
 				socket.join(gameRoom.id)
 				debug(user.name, 'created and joined a game:', gameRoom.id)
 			}
 
-			else if (existingRoom.userCount = 1) {
+			else if (existingRoom.userCount === 1) {
 				const user = await createUser({
 					id: socket.id,
 					name: username,
