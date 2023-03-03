@@ -79,6 +79,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 		}
 		catch (err) {
 			debug('ERROR!')
+			console.log(err)
 		}
 	})
 
