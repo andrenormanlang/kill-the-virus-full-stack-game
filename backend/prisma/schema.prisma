@@ -15,8 +15,8 @@ model GameRoom {
 }
 
 model User {
-    id         String   @id @map("_id")
+    id         String    @id @map("_id")
     name       String
-    gameRoom   GameRoom @relation(fields: [gameRoomId], references: [id])
-    gameRoomId String   @db.ObjectId
+    gameRoom   GameRoom? @relation(fields: [gameRoomId], references: [id])
+    gameRoomId String?   @db.ObjectId
 }
