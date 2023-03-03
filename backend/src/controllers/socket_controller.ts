@@ -24,18 +24,12 @@ const showVirus = (roomId: string, round: number) => {
 
 // Handle the user connecting
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
-	// debug('🙋🏼 A user connected -', socket.id)
+	debug('🙋🏼 A user connected -', socket.id)
 
-	// // Handle user disconnecting
-	// socket.on('disconnect', () => {
-	// 	debug('✌🏻 A user disconnected', socket.id)
-	// })
-
-	socket.emit('hello')
-
-	// socket.on('userJoinedLobby', (username) => {
-	// 	debug('Welcome to the lobby', username)
-	// })
+	// Handle user disconnecting
+	socket.on('disconnect', () => {
+		debug('✌🏻 A user disconnected', socket.id)
+	})
 
 	let round = 0
 
@@ -79,73 +73,49 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			}
 		}
 		catch (err) {
-			debug('ERROR!')
-			console.log(err)
+			debug('ERROR creating or joining a game!')
 		}
 	})
 
 
 	socket.on('clickVirus', async (timeTakenToClick) => {
-		const user = await prisma.user.findUnique({ where: { id: socket.id } })
-		if (!user) return
+		try {
+			const user = await prisma.user.findUnique({ where: { id: socket.id } })
+			if (!user) return
 
-		const gameRoom = await prisma.gameRoom.findUnique({ where: { id: user.gameRoomId } })
-		if (!gameRoom) return
+			const gameRoom = await prisma.gameRoom.findUnique({ where: { id: user.gameRoomId } })
+			if (!gameRoom) return
 
-		round++
-		if (round > 10) return io.to(gameRoom.id).emit('endGame')
+			round++
+			if (round > 10) return io.to(gameRoom.id).emit('endGame')
 
-		const reactionTime = timeTakenToClick
-		const newReactionTime = await prisma.reactionTime.create({
-			data: {
-				time: reactionTime,
-				user: {
-					connect: { id: user!.id }
+			const newReactionTime = await prisma.reactionTime.create({
+				data: {
+					time: timeTakenToClick,
+					user: {
+						connect: { id: user.id }
+					}
 				}
-			}
-		})
-
-		const updatedGameRoom = await prisma.gameRoom.update({
-			where: { id: user.gameRoomId },
-			data: { clickedUsers: [...gameRoom.clickedUsers, user.id] }
-		})
-
-		if (updatedGameRoom.clickedUsers.length === updatedGameRoom.userCount) {
-			// All users have clicked, start the next round
-			showVirus(user.gameRoomId, round)
-
-			// Reset clickedUsers
-			await prisma.gameRoom.update({
-				where: { id: gameRoom.id },
-				data: { clickedUsers: [] }
 			})
+
+			const updatedGameRoom = await prisma.gameRoom.update({
+				where: { id: user.gameRoomId },
+				data: { clickedUsers: [...gameRoom.clickedUsers, user.id] }
+			})
+
+			if (updatedGameRoom.clickedUsers.length >= updatedGameRoom.userCount) {
+				// All users have clicked, start the next round
+				showVirus(user.gameRoomId, round)
+
+				// Reset clickedUsers
+				await prisma.gameRoom.update({
+					where: { id: gameRoom.id },
+					data: { clickedUsers: [] }
+				})
+			}
+		}
+		catch (err) {
+			debug('ERROR clicking the virus!', err)
 		}
 	})
-
-
-
-	// let timer: number
-
-	// const cells = document.querySelectorAll('.cell');
-	// const randomIndex = Math.floor(Math.random() * cells.length);
-	// const randomCell = cells[randomIndex] as HTMLDivElement
-
-	// nextVirus(randomCell)
-
-	// let round = 0
-	// const nextVirus = (randomCell: HTMLDivElement) => {
-	// 	randomCell.addEventListener('click', () => {
-	// 		round++
-	// 		// Remove any existing virus emoji
-	// 		const existingVirus = document.querySelector('.cell-virus');
-	// 		if (existingVirus) {
-	// 			existingVirus.textContent = '';
-	// 			existingVirus.classList.remove('cell-virus');
-	// 		}
-
-	// 		if (round >= 10) return console.log("Good game, well played!")
-
-	// 		displayVirus()
-	// 	})
-	// }
 }
