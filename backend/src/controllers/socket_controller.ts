@@ -80,10 +80,12 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 		}
 		catch (err) {
 			debug('ERROR!')
+			console.log(err)
 		}
 	})
 
-	socket.on('clickVirus', async () => {
+
+	socket.on('clickVirus', async (timeTakenToClick) => {
 		const user = await prisma.user.findUnique({ where: { id: socket.id } })
 		if (!user) return
 
@@ -92,6 +94,16 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 		round++
 		if (round > 10) return io.to(gameRoom.id).emit('endGame')
+
+		const reactionTime = timeTakenToClick
+		const newReactionTime = await prisma.reactionTime.create({
+			data: {
+				time: reactionTime,
+				user: {
+					connect: { id: user!.id }
+				}
+			}
+		})
 
 		const updatedGameRoom = await prisma.gameRoom.update({
 			where: { id: user.gameRoomId },
