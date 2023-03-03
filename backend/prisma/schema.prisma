@@ -8,10 +8,9 @@ datasource db {
 }
 
 model GameRoom {
-    id           String   @id @default(auto()) @map("_id") @db.ObjectId
-    userCount    Int      @default(1)
-    users        User[]
-    clickedUsers String[]
+    id        String @id @default(auto()) @map("_id") @db.ObjectId
+    userCount Int    @default(1)
+    users     User[]
 }
 
 model User {
@@ -20,6 +19,7 @@ model User {
     gameRoom     GameRoom       @relation(fields: [gameRoomId], references: [id])
     gameRoomId   String         @db.ObjectId
     reactionTime ReactionTime[]
+    virusClicked Boolean?
 }
 
 model ReactionTime {

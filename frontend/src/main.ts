@@ -49,6 +49,10 @@ socket.on('endGame', () => {
 	console.log('Game ended, goodbye.')
 })
 
+socket.on('reactionTime', (reactionTime) => {
+	console.log('reactionTime', reactionTime)
+})
+
 usernameFormEl.addEventListener('submit', e => {
 	e.preventDefault();
 
@@ -92,7 +96,7 @@ usernameFormEl.addEventListener('submit', e => {
 		const timeTakenToClick = Number((Date.now() / 1000 - timer).toFixed(3))
 		console.log("It took", timeTakenToClick, "seconds")
 
-		socket.emit('clickVirus', timeTakenToClick);
+		socket.emit('clickVirus', timeTakenToClick)
 	})
 })
 
