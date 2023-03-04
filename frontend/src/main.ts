@@ -50,7 +50,8 @@ socket.on('endGame', () => {
 })
 
 socket.on('reactionTime', (reactionTime) => {
-	console.log('reactionTime', reactionTime)
+	console.log('Opponent:', reactionTime);
+	(document.querySelector('#opponentTime') as HTMLDivElement).innerText = ` ${reactionTime}`
 })
 
 usernameFormEl.addEventListener('submit', e => {
@@ -94,7 +95,8 @@ usernameFormEl.addEventListener('submit', e => {
 		(document.querySelector('#virus') as HTMLDivElement).remove()
 
 		const timeTakenToClick = Number((Date.now() / 1000 - timer).toFixed(3))
-		console.log("It took", timeTakenToClick, "seconds")
+		console.log('My time:', timeTakenToClick);
+		(document.querySelector('#myTime') as HTMLDivElement).innerText = ` ${timeTakenToClick}`
 
 		socket.emit('clickVirus', timeTakenToClick)
 	})
