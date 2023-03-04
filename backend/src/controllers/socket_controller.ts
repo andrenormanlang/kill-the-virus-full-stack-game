@@ -51,7 +51,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 	socket.on('userJoin', async (username) => {
 		try {
-			// Find an existing room with only 1 user
+			// Find an existing gameRoom with only 1 user
 			const existingRoom = await prisma.gameRoom.findFirst({ where: { userCount: 1 } })
 
 			if (!existingRoom || existingRoom.userCount !== 1) {
@@ -100,59 +100,56 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			const user = await prisma.user.findUnique({ where: { id: socket.id } })
 			if (!user) return
 
-			const gameRoom = await prisma.gameRoom.findUnique({ where: { id: user.gameRoomId } })
+			// Update the users virusClicked to 'true'
+			await prisma.user.update({
+				where: { id: user.id },
+				data: { virusClicked: true }
+			})
+
+			const gameRoom = await prisma.gameRoom.findUnique({ where: { id: user.gameRoomId }, include: { users: true } })
 			if (!gameRoom) return
 
 			round++
 			// When the game ends
 			if (round > 10) {
-				const reactionTimes = await prisma.reactionTime.findMany({ where: { id: user.gameRoomId } })
-				debug('reactionTimes', reactionTimes)
+				// const reactionTimes = await prisma.reactionTime.findMany({ where: { id: user.gameRoomId } })
+				// debug('reactionTimes', reactionTimes)
 				
 				return io.to(gameRoom.id).emit('endGame')
 			}
 
 			// Save each players reaction time in the database
-			const newReactionTime = await prisma.reactionTime.create({
+			await prisma.reactionTime.create({
 				data: {
 					time: timeTakenToClick,
 					userId: user.id
 				}
 			})
-			// debug('newReactionTime', newReactionTime)
 
 			socket.broadcast.to(gameRoom.id).emit('reactionTime', timeTakenToClick)
 
-			// const userClicked = await prisma.user.update({
-			// 	where: { id: user.id },
-			// 	data: { virusClicked: true }
-			// })
-			// debug('%s clicked the virus:', userClicked.id)
+			// Counts how many viruses are clicked by users (from 0 to 2)
+			let virusesGone = 0
+			// Check every players 'virusClicked'. If it's 'true' increase 'virusesGone' by 1
+			// After the first player clicks virusesGone = 1
+			// After the second player clicks virusesGone = 2
+			gameRoom.users.forEach(user => {
+				if (user.virusClicked) virusesGone++
+			})
 
-			// const checkClickedStatus = gameRoom.users.map((user) => {
-			// 	user.virusClicked
-			// })
-			// debug(checkClickedStatus)
+			// Check if both players viruses are clicked
+			if (virusesGone !== gameRoom.userCount) return
 
-			// // Man kan inte pusha bådas klick till samma ställe i databasen, den måste hinna hämta ändringarna från den förstas,
-			// // innan den kan lägga till den andras ändring. Precis som när ett rum skapas.
-			// // Skulle kanske kunna uppdatera userns document istället för att ändra rummets, då skickar de en query till olika ställen i databasen och kan inte clasha med varandra.
-			// const updatedGameRoom = await prisma.gameRoom.update({
-			// 	where: { id: gameRoom.id},
-			// 	data: { virusClicks: gameRoom.virusClicks + 1 }
-			// })
-			// debug(updatedGameRoom.virusClicks)
+			// Reset virusClicked for each player
+			gameRoom.users.forEach(async (user) => {
+				await prisma.user.update({
+					where: { id: user.id },
+					data: { virusClicked: false }
+				})
+			})
 
-			// if (updatedGameRoom.virusClicks >= updatedGameRoom.userCount) {
-			// 	// Reset virusClicks
-			// 	await prisma.gameRoom.update({
-			// 		where: { id: gameRoom.id },
-			// 		data: { virusClicks: 0 }
-			// 	})
-
-			// 	// All users have clicked, start the next round
-			// 	showVirus(user.gameRoomId, round)
-			// }
+			// Call the next virus
+			showVirus(user.gameRoomId, round)
 		}
 		catch (err) {
 			debug('ERROR clicking the virus!', err)
