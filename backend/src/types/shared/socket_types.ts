@@ -26,3 +26,7 @@ export interface ReactionTimeData {
 	time: number
 	userId: string
 }
+
+export interface GameRoomData {
+	userCount: number
+}

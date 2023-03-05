@@ -15,10 +15,10 @@ export const createUser = (data: User) => {
 	return prisma.user.create({ data })
 }
 
-export const updateUsersVirusClicked = (userId: string, virusClicked: boolean) => {
+export const updateUsersVirusClicked = (userId: string, virusClickedData: { virusClicked: boolean }) => {
 	return prisma.user.update({
 		where: { id: userId },
-		data: { virusClicked }
+		data: virusClickedData,
 	})
 }
 

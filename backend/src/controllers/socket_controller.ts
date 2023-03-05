@@ -1,13 +1,13 @@
 /**
  * Socket Controller
  */
-import prisma from '../prisma'
 import Debug from 'debug'
 import { Socket } from 'socket.io'
 import { createUser, deleteUser, findUser, updateUsersVirusClicked } from '../services/user_service'
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/socket_types'
 import { io } from '../../server'
 import { createReactionTime, deleteReactionTimes, findReactionTimesByUserId, findReactionTimesByRoomId } from '../services/reactionTime_service'
+import { createGameRoom, deleteGameRoom, findGameRoomById, findGameRoomByUserCount, updateGameRoomsUserCount } from '../services/gameRoom_service'
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
@@ -42,10 +42,10 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 		const deletedUser = await deleteUser(user.id)
 		debug('User deleted:', deletedUser.name)
 
-		const gameRoom = await prisma.gameRoom.findUnique({ where: { id: user.gameRoomId} })
+		const gameRoom = await findGameRoomById(user.gameRoomId)
 		if (!gameRoom) return
-		const deleteRoom = await prisma.gameRoom.delete({ where: { id: user.gameRoomId } })
-		debug('Room deleted:', deleteRoom)
+		const deletedRoom = await deleteGameRoom(user.gameRoomId)
+		debug('Room deleted:', deletedRoom)
 	})
 
 	let round = 0
@@ -53,11 +53,11 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	socket.on('userJoin', async (username) => {
 		try {
 			// Find an existing gameRoom with only 1 user
-			const existingRoom = await prisma.gameRoom.findFirst({ where: { userCount: 1 } })
+			const existingRoom = await findGameRoomByUserCount(1)
 
 			if (!existingRoom || existingRoom.userCount !== 1) {
 				// Create a new gameRoom
-				const gameRoom = await prisma.gameRoom.create({ data: { userCount: 1 } })
+				const gameRoom = await createGameRoom({ userCount: 1 })
 
 				// Create a user and connect with newly created gameRoom
 				const user = await createUser({
@@ -79,10 +79,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 					virusClicked: false,
 				})
 
-				await prisma.gameRoom.update({
-					where: { id: existingRoom.id },
-					data: { userCount: 2 }
-				})
+				await updateGameRoomsUserCount(existingRoom.id, { userCount: 2 })
 
 				socket.join(existingRoom.id)
 				debug(user.name, 'joined a game:', existingRoom.id)
@@ -102,9 +99,9 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			if (!user) return
 
 			// Update the users virusClicked to 'true'
-			await updateUsersVirusClicked(user.id, true)
+			await updateUsersVirusClicked(user.id, { virusClicked: true })
 
-			const gameRoom = await prisma.gameRoom.findUnique({ where: { id: user.gameRoomId }, include: { users: true } })
+			const gameRoom = await findGameRoomById(user.gameRoomId)
 			if (!gameRoom) return
 
 			round++
@@ -138,7 +135,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 			// Reset virusClicked for each player
 			gameRoom.users.forEach(async (user) => {
-				await updateUsersVirusClicked(user.id, false)
+				await updateUsersVirusClicked(user.id, { virusClicked: false })
 			})
 
 			// Call the next virus
