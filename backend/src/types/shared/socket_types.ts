@@ -21,3 +21,8 @@ export interface ClientToServerEvents {
 	userJoin: (username: string) => void
 	clickVirus: (timeTakenToClick: number) => void
 }
+
+export interface ReactionTimeData {
+	time: number
+	userId: string
+}

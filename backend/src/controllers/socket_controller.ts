@@ -7,6 +7,7 @@ import { Socket } from 'socket.io'
 import { createUser } from '../services/user_service'
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/socket_types'
 import { io } from '../../server'
+import { createReactionTime, deleteReactionTimes, findReactionTimes, findReactionTimesByRoomId } from '../services/reactionTime_service'
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
@@ -33,10 +34,10 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 		const user = await prisma.user.findUnique({ where: { id: socket.id }, include: { reactionTime: true } })
 		if (!user) return
 
-		const reactionTimes = await prisma.reactionTime.findMany({ where: { userId: user.id} })
+		const reactionTimes = await findReactionTimes(user.id)
 		if (!reactionTimes) return
-		const deleteReactionTimes = await prisma.reactionTime.deleteMany({ where: { userId: user.id } })
-		debug('Reaction times deleted:', deleteReactionTimes)
+		const deletedReactionTimes = await deleteReactionTimes(user.id)
+		debug('Reaction times deleted:', deletedReactionTimes)
 
 		const deleteUser = await prisma.user.delete({ where: { id: user.id }, include: { reactionTime: true } })
 		debug('User deleted:', deleteUser.name)
@@ -112,18 +113,16 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			round++
 			// When the game ends
 			if (round > 10) {
-				// const reactionTimes = await prisma.reactionTime.findMany({ where: { id: user.gameRoomId } })
-				// debug('reactionTimes', reactionTimes)
+				// const allReactionTimes = await findReactionTimesByRoomId(gameRoom.id)
+				// debug('allReactionTimes:', allReactionTimes)
 				
 				return io.to(gameRoom.id).emit('endGame')
 			}
 
 			// Save each players reaction time in the database
-			await prisma.reactionTime.create({
-				data: {
-					time: timeTakenToClick,
-					userId: user.id
-				}
+			await createReactionTime({
+				time: timeTakenToClick,
+				userId: user.id
 			})
 
 			socket.broadcast.to(gameRoom.id).emit('reactionTime', timeTakenToClick)
