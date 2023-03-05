@@ -4,10 +4,10 @@
 import prisma from '../prisma'
 import Debug from 'debug'
 import { Socket } from 'socket.io'
-import { createUser } from '../services/user_service'
+import { createUser, deleteUser, findUser, updateUsersVirusClicked } from '../services/user_service'
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/socket_types'
 import { io } from '../../server'
-import { createReactionTime, deleteReactionTimes, findReactionTimes, findReactionTimesByRoomId } from '../services/reactionTime_service'
+import { createReactionTime, deleteReactionTimes, findReactionTimesByUserId, findReactionTimesByRoomId } from '../services/reactionTime_service'
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
@@ -31,16 +31,16 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	socket.on('disconnect', async () => {
 		debug('✌🏻 A user disconnected', socket.id)
 		
-		const user = await prisma.user.findUnique({ where: { id: socket.id }, include: { reactionTime: true } })
+		const user = await findUser(socket.id)
 		if (!user) return
 
-		const reactionTimes = await findReactionTimes(user.id)
+		const reactionTimes = await findReactionTimesByUserId(user.id)
 		if (!reactionTimes) return
 		const deletedReactionTimes = await deleteReactionTimes(user.id)
 		debug('Reaction times deleted:', deletedReactionTimes)
 
-		const deleteUser = await prisma.user.delete({ where: { id: user.id }, include: { reactionTime: true } })
-		debug('User deleted:', deleteUser.name)
+		const deletedUser = await deleteUser(user.id)
+		debug('User deleted:', deletedUser.name)
 
 		const gameRoom = await prisma.gameRoom.findUnique({ where: { id: user.gameRoomId} })
 		if (!gameRoom) return
@@ -98,14 +98,11 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 	socket.on('clickVirus', async (timeTakenToClick) => {
 		try {
-			const user = await prisma.user.findUnique({ where: { id: socket.id } })
+			const user = await findUser(socket.id)
 			if (!user) return
 
 			// Update the users virusClicked to 'true'
-			await prisma.user.update({
-				where: { id: user.id },
-				data: { virusClicked: true }
-			})
+			await updateUsersVirusClicked(user.id, true)
 
 			const gameRoom = await prisma.gameRoom.findUnique({ where: { id: user.gameRoomId }, include: { users: true } })
 			if (!gameRoom) return
@@ -141,10 +138,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 			// Reset virusClicked for each player
 			gameRoom.users.forEach(async (user) => {
-				await prisma.user.update({
-					where: { id: user.id },
-					data: { virusClicked: false }
-				})
+				await updateUsersVirusClicked(user.id, false)
 			})
 
 			// Call the next virus
