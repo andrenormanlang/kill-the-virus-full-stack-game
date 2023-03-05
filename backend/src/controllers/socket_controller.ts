@@ -30,22 +30,27 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	// Handle user disconnecting
 	socket.on('disconnect', async () => {
 		debug('✌🏻 A user disconnected', socket.id)
-		
-		const user = await findUser(socket.id)
-		if (!user) return
 
-		const reactionTimes = await findReactionTimesByUserId(user.id)
-		if (!reactionTimes) return
-		const deletedReactionTimes = await deleteReactionTimes(user.id)
-		debug('Reaction times deleted:', deletedReactionTimes)
+		try {
+			const user = await findUser(socket.id)
+			if (!user) return
 
-		const deletedUser = await deleteUser(user.id)
-		debug('User deleted:', deletedUser.name)
+			const reactionTimes = await findReactionTimesByUserId(user.id)
+			if (!reactionTimes) return
+			const deletedReactionTimes = await deleteReactionTimes(user.id)
+			debug('Reaction times deleted:', deletedReactionTimes)
 
-		const gameRoom = await findGameRoomById(user.gameRoomId)
-		if (!gameRoom) return
-		const deletedRoom = await deleteGameRoom(user.gameRoomId)
-		debug('Room deleted:', deletedRoom)
+			const deletedUser = await deleteUser(user.id)
+			debug('User deleted:', deletedUser.name)
+
+			const gameRoom = await findGameRoomById(user.gameRoomId)
+			if (!gameRoom) return
+			const deletedRoom = await deleteGameRoom(user.gameRoomId)
+			debug('Room deleted:', deletedRoom)
+		}
+		catch (err) {
+			debug('ERROR finding or deleting one of following: reactionTimes, user, gameRoom')
+		}
 	})
 
 	let round = 0
