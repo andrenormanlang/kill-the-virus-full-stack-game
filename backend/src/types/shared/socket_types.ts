@@ -30,3 +30,10 @@ export interface ReactionTimeData {
 export interface GameRoomData {
 	userCount: number
 }
+
+export interface UserData {
+	id: string
+	name: string
+	gameRoomId: string
+	virusClicked?: boolean
+}

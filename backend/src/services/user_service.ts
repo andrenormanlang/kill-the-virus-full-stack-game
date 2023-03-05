@@ -2,17 +2,14 @@
  * User Sercive
  */
 import prisma from '../prisma'
-import { User } from '@prisma/client'
+import { UserData } from '../types/shared/socket_types'
 
 export const findUser = (userId: string) => {
-	return prisma.user.findUnique({
-		where: { id: userId },
-		include: { reactionTime: true }
-	})
+	return prisma.user.findUnique({ where: { id: userId } })
 }
 
-export const createUser = (data: User) => {
-	return prisma.user.create({ data })
+export const createUser = (userData: UserData) => {
+	return prisma.user.create({ data: userData })
 }
 
 export const updateUsersVirusClicked = (userId: string, virusClickedData: { virusClicked: boolean }) => {

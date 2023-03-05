@@ -64,7 +64,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 					id: socket.id,
 					name: username,
 					gameRoomId: gameRoom.id,
-					virusClicked: false,
 				})
 
 				socket.join(gameRoom.id)
@@ -76,7 +75,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 					id: socket.id,
 					name: username,
 					gameRoomId: existingRoom.id,
-					virusClicked: false,
 				})
 
 				await updateGameRoomsUserCount(existingRoom.id, { userCount: 2 })
@@ -113,11 +111,11 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 				return io.to(gameRoom.id).emit('endGame')
 			}
 
-			// Save each players reaction time in the database
-			await createReactionTime({
-				time: timeTakenToClick,
-				userId: user.id
-			})
+			// // Save each players reaction time in the database
+			// await createReactionTime({
+			// 	time: timeTakenToClick,
+			// 	userId: user.id
+			// })
 
 			socket.broadcast.to(gameRoom.id).emit('reactionTime', timeTakenToClick)
 
