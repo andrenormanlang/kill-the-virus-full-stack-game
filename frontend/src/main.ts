@@ -51,6 +51,17 @@ const displayVirus = (virusData: VirusData) => {
 	}, delay)
 }
 
+toLobbyEl.addEventListener('click', () => {
+
+	socket.emit('toLobby')
+	
+	lobbyEl.style.display = 'block'
+	gameEl.style.display = 'none'
+	endGameBoardEl.style.display = 'none'
+	location.reload()
+	
+})
+
 socket.on('connect', () => {
 	console.log('Connected to server')
 })
@@ -69,15 +80,6 @@ socket.on('endGame', () => {
 	gameEl.style.display = 'none'
 	endGameBoardEl.style.display = 'block'
 	
-	toLobbyEl.addEventListener('submit', (e) => {
-		e.preventDefault
-		
-		lobbyEl.style.display = 'block'
-		gameEl.style.display = 'none'
-		endGameBoardEl.style.display = 'none'
-		
-		// socket.emit('toLobby')
-	})
 	
 	console.log('Game ended, goodbye.')
 })

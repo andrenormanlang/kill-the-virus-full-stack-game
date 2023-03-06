@@ -13,6 +13,7 @@ import prisma from '../prisma'
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
 
+
 // Calculate where and when the virus will appear
 const calcVirusData = () => {
 	return {
@@ -198,24 +199,35 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			debug('ERROR clicking the virus!', err)
 		}
 
-		// socket.on('toLobby', async () => {
-
-		// 	debug('✌🏻 A user disconnected', socket.id)
-	
-		// 	try {
-		// 		const user = await findUser(socket.id)
-		// 		if (!user) return
-	
-		// 		const gameRoom = await findGameRoomById(user.gameRoomId)
-		// 		if (!gameRoom) return
-		// 		const deletedRoom = await deleteGameRoom(user.gameRoomId)
-		// 		debug('Room deleted:', deletedRoom)
-		// 	}
-		// 	catch (err) {
-		// 		debug('ERROR finding or deleting one of following: user, gameRoom')
-		// 	}
-		// })
 	})
+
+	socket.on('toLobby', async () => {
+
+		debug('✌🏻 A user went to Lobby', socket.id)
+
+		try {
+			const user = await findUser(socket.id)
+			if (!user) return
+
+			const reactionTimes = await findReactionTimesByUserId(user.id)
+			if (!reactionTimes) return
+			const deletedReactionTimes = await deleteReactionTimes(user.id)
+			debug('Reaction times deleted:', deletedReactionTimes)
+
+			const deletedUser = await deleteUser(user.id)
+			debug('User deleted:', deletedUser.name)
+
+			const gameRoom = await findGameRoomById(user.gameRoomId)
+			if (!gameRoom) return
+			const deletedRoom = await deleteGameRoom(user.gameRoomId)
+			debug('Room deleted:', deletedRoom)
+
+		}
+		catch (err) {
+			debug('ERROR finding or deleting one of following: user, gameRoom', err)
+		}
+	})
+
 }
 
 
