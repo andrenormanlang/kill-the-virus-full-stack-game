@@ -8,6 +8,8 @@ export { }
 // Events emitted by the server to the client
 export interface ServerToClientEvents {
 	hello: () => void
+	firstRound: (firstRoundData: FirstRoundData) => void
+	newRound: (newRoundData: NewRoundData) => void
 	showVirus: (row: number, column: number, delay: number, round: number) => void
 	userJoinedGame: (username: string) => void
 	roomAvailable: (room: GameRoom) => void
@@ -37,4 +39,17 @@ export interface UserData {
 	name: string
 	gameRoomId: string
 	virusClicked?: boolean
+}
+
+export interface FirstRoundData {
+	row: number
+	column: number
+	delay: number
+}
+
+export interface NewRoundData {
+	row: number
+	column: number
+	delay: number
+	round: number
 }

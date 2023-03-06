@@ -57,7 +57,6 @@ toLobbyEl.addEventListener('submit', (e) => {
 	})
 })
 
-
 socket.on('endGame', () => {
 	lobbyEl.style.display = 'none'
 	gameEl.style.display = 'none'
@@ -69,6 +68,36 @@ socket.on('endGame', () => {
 socket.on('reactionTime', (reactionTime) => {
 	console.log('Opponent:', reactionTime);
 	(document.querySelector('#opponentTime') as HTMLDivElement).innerText = ` ${reactionTime}`
+})
+
+let timer: number
+
+socket.on('firstRound', (firstRoundData) => {
+	const { row, column, delay } = firstRoundData
+	// Hide lobby and show game
+	lobbyEl.style.display = 'none';
+	gameEl.style.display = 'block'
+	spinnerEl.classList.remove('hide')
+	// console.log('Round:', round)
+
+	setTimeout(() => {
+		(document.querySelector('#gameScreen') as HTMLDivElement).innerHTML = `
+			<div class="virus" id="virus" style="grid-row: ${row}; grid-column: ${column};">🦠</div>
+		`
+		timer = Date.now() / 1000
+	}, delay)
+})
+
+socket.on('newRound', (newRoundData) => {
+	const { row, column, delay, round } = newRoundData
+		console.log('Round:', round)
+
+	setTimeout(() => {
+		(document.querySelector('#gameScreen') as HTMLDivElement).innerHTML = `
+			<div class="virus" id="virus" style="grid-row: ${row}; grid-column: ${column};">🦠</div>
+		`
+		timer = Date.now() / 1000
+	}, delay)
 })
 
 usernameFormEl.addEventListener('submit', e => {
@@ -83,25 +112,6 @@ usernameFormEl.addEventListener('submit', e => {
 	
 	// socket.emit('userJoinedLobby', username)
 	socket.emit('userJoin', username)
-
-	let timer: number
-
-	socket.on('showVirus', (row, column, delay, round) => {
-		// Hide lobby and show game
-		lobbyEl.style.display = 'none';
-		gameEl.style.display = 'block'
-		spinnerEl.classList.remove('hide')
-		console.log('Round:', round)
-
-		setTimeout(() => {
-			(document.querySelector('#gameScreen') as HTMLDivElement).innerHTML = `
-				<div class="virus" id="virus" style="grid-row: ${row}; grid-column: ${column};">🦠</div>
-			`
-			timer = Date.now() / 1000
-		}, delay)
-	})
-
-
 
 	// Eventlistener when clicking the virus
 	gameScreenEl.addEventListener("click", e => {

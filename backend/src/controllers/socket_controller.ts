@@ -4,7 +4,7 @@
 import Debug from 'debug'
 import { Socket } from 'socket.io'
 import { createUser, deleteUser, findUser, updateUsersVirusClicked } from '../services/user_service'
-import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/socket_types'
+import { ClientToServerEvents, NewRoundData, ServerToClientEvents } from '../types/shared/socket_types'
 import { io } from '../../server'
 import { createReactionTime, deleteReactionTimes, findReactionTimesByUserId, findReactionTimesByRoomId } from '../services/reactionTime_service'
 import { createGameRoom, deleteGameRoom, findGameRoomById, findGameRoomByUserCount, updateGameRoomsUserCount } from '../services/gameRoom_service'
@@ -13,15 +13,13 @@ import prisma from '../prisma'
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
 
-const showVirus = (roomId: string, round: number) => {
-	// Calculate where and when the virus will appear
-	const row = Math.ceil(Math.random() * 10)
-	const column = Math.ceil(Math.random() * 10)
-	const delay = Math.ceil(Math.random() * 5) * 1000
-
-	debug("Sending virus: row %s, col %s, delay %s, to %s", row, column, delay / 1000, roomId)
-
-	io.to(roomId).emit('showVirus', row, column, delay, round)
+// Calculate where and when the virus will appear
+const calcVirusData = () => {
+	return {
+		row: Math.ceil(Math.random() * 10),
+		column: Math.ceil(Math.random() * 10),
+		delay:Math.ceil(Math.random() * 5) * 1000,
+	}
 }
 
 // Handle the user connecting
@@ -88,8 +86,14 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 				socket.join(existingRoom.id)
 				debug(user.name, 'joined a game:', existingRoom.id)
 
-				round++
-				showVirus(existingRoom.id, round)
+				const virusData = calcVirusData()
+				const firstRoundPayload = {
+					row: virusData.row,
+					column: virusData.column,
+					delay: virusData.delay,
+				}
+
+				io.to(existingRoom.id).emit('firstRound', firstRoundPayload)
 			}
 		}
 		catch (err) {
@@ -142,8 +146,17 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 				await updateUsersVirusClicked(user.id, { virusClicked: false })
 			})
 
-			// Call the next virus
-			showVirus(user.gameRoomId, round)
+			// Get the virus information
+			const virusData = calcVirusData()
+			const newRoundPayload: NewRoundData = {
+				row: virusData.row,
+				column: virusData.column,
+				delay: virusData.delay,
+				round: round,
+			}
+
+			// Give the next virus to both players
+			io.to(gameRoom.id).emit('newRound', newRoundPayload)
 		}
 		catch (err) {
 			debug('ERROR clicking the virus!', err)
