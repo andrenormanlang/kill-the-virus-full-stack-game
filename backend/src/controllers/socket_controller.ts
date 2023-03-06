@@ -114,22 +114,11 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			const gameRoom = await findGameRoomById(user.gameRoomId)
 			if (!gameRoom) return
 
-			round++
-			// When the game ends
-			if (round > 10) {
-				// const allReactionTimes = await findReactionTimesByRoomId(gameRoom.id)
-				// debug('allReactionTimes:', allReactionTimes)
-
-				return io.to(gameRoom.id).emit('endGame')
-			}
-
 			// Save each players reaction time in the database
 			await createReactionTime({
 				time: timeTakenToClick,
 				userId: user.id
 			})
-
-
 
 			socket.broadcast.to(gameRoom.id).emit('reactionTime', timeTakenToClick)
 
@@ -209,26 +198,35 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 				} catch (err) {
 					debug('Error updating scores:', err)
 				}
-			}
 
-			updateScoresForGameRoom(gameRoom.id)
+			}
 
 			// Reset virusClicked for each player
 			gameRoom.users.forEach(async (user) => {
 				await updateUsersVirusClicked(user.id, { virusClicked: false })
 			})
 
-			// Get the virus information
-			const virusData = calcVirusData()
-			const newRoundPayload: NewRoundData = {
-				row: virusData.row,
-				column: virusData.column,
-				delay: virusData.delay,
-				round: round,
+			round++
+
+			// When the game ends
+			if (round > 10) {
+				// const allReactionTimes = await findReactionTimesByRoomId(gameRoom.id)
+				// debug('allReactionTimes:', allReactionTimes)
+
+				io.to(gameRoom.id).emit('endGame')
+			} else {
+				// Get the virus information
+				const virusData = calcVirusData()
+				const newRoundPayload: NewRoundData = {
+					row: virusData.row,
+					column: virusData.column,
+					delay: virusData.delay,
+					round: round,
+				}
+				// Give the next virus to both players
+				io.to(gameRoom.id).emit('newRound', newRoundPayload)
 			}
 
-			// Give the next virus to both players
-			io.to(gameRoom.id).emit('newRound', newRoundPayload)
 		}
 		catch (err) {
 			debug('ERROR clicking the virus!', err)
