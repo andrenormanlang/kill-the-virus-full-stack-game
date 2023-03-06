@@ -13,6 +13,7 @@ export interface ServerToClientEvents {
 	roomAvailable: (room: GameRoom) => void
 	endGame: () => void
 	reactionTime: (reactionTime: number) => void
+	reset: () => void
 }
 
 // Events emitted by the client to the server

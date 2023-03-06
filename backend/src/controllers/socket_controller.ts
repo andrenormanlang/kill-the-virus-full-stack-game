@@ -149,3 +149,29 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 		}
 	})
 }
+
+export const restart = (socket: Socket<ServerToClientEvents>) => {
+	
+	try{
+		socket.on('reset', async () => {
+			debug('✌🏻 A user disconnected', socket.id)
+		const user = await prisma.user.findUnique({
+			where: {
+				id: socket.id
+			}
+		})
+
+		if (!user) return
+
+		const deleteRoom = await prisma.gameRoom.delete({
+			where: {
+				id: user?.gameRoomId
+			}
+		})
+		console.log(deleteRoom)
+		})
+	} catch (err){
+		debug('ERROR resetting', err)
+	}
+
+}

@@ -10,10 +10,14 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOS
 const usernameBtnEl = document.querySelector('#enter') as HTMLFormElement
 const usernameFormEl = document.querySelector('#username-form') as HTMLFormElement
 
+// button
+const toLobbyEl = document.querySelector('#toLobby') as HTMLButtonElement
+
 // Div
 const gameEl = document.querySelector('#game') as HTMLDivElement
 const gameScreenEl = document.querySelector("#gameScreen") as HTMLDivElement
 const lobbyEl = document.querySelector('#lobby') as HTMLDivElement
+const endGameBoardEl = document.querySelector('#endGameBoard') as HTMLDivElement
 const spinnerEl = document.querySelector('#spinner') as HTMLFormElement
 
 // User details
@@ -45,8 +49,21 @@ socket.on('userJoinedGame', (username) => {
 	console.log(username, 'has joined the game')
 })
 
+toLobbyEl.addEventListener('submit', (e) => {
+	e.preventDefault
+	
+	socket.on ('reset', () => {
+		console.log('restarting game')
+	})
+})
+
+
 socket.on('endGame', () => {
+	lobbyEl.style.display = 'none'
+	gameEl.style.display = 'none'
+	endGameBoardEl.style.display = 'block'
 	console.log('Game ended, goodbye.')
+	
 })
 
 socket.on('reactionTime', (reactionTime) => {
