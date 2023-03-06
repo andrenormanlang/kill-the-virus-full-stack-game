@@ -18,7 +18,7 @@ const calcVirusData = () => {
 	return {
 		row: Math.ceil(Math.random() * 10),
 		column: Math.ceil(Math.random() * 10),
-		delay:Math.ceil(Math.random() * 5) * 1000,
+		delay: Math.ceil(Math.random() * 5) * 1000,
 	}
 }
 
@@ -127,6 +127,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 				userId: user.id
 			})
 
+
+
 			socket.broadcast.to(gameRoom.id).emit('reactionTime', timeTakenToClick)
 
 			// Counts how many viruses are clicked by users (from 0 to 2)
@@ -140,6 +142,21 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 			// Check if both players viruses are clicked
 			if (virusesGone !== gameRoom.userCount) return
+
+			const latestReactionTimes = await prisma.reactionTime.findMany({
+				where: {
+					user: {
+						gameRoomId: gameRoom.id
+					}
+				},
+				take: 2,
+				orderBy: [
+					{
+						id: 'desc'
+					}
+				]
+			})
+			debug('latestReactionTimes:', latestReactionTimes)
 
 			// Reset virusClicked for each player
 			gameRoom.users.forEach(async (user) => {
