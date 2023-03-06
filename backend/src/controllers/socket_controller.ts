@@ -198,9 +198,12 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 						const player1Score = getPlayerScores[0]?.score ?? 0;
 						const player2Score = getPlayerScores[1]?.score ?? 0;
 
+						const player1Id = getPlayerScores[0]?.id
+						const player2Id = getPlayerScores[1]?.id
+
 						debug('players score:', getPlayerScores)
 
-						io.to(gameRoom.id).emit('updateScore', player1Score, player2Score)
+						io.to(gameRoom.id).emit('updateScore', player1Score, player2Score, player1Id, player2Id)
 
 					}
 				} catch (err) {

@@ -15,7 +15,7 @@ export interface ServerToClientEvents {
 	endGame: () => void
 	reactionTime: (reactionTime: number) => void
 	reset: () => void
-	updateScore: (player1Score: number, player2Score: number) => void
+	updateScore: (player1Score: number, player2Score: number, player1Id: string, player2Id: string) => void
 }
 
 // Events emitted by the client to the server

@@ -129,13 +129,15 @@ usernameFormEl.addEventListener('submit', e => {
 })
 
 
-socket.on('updateScore', (player1Score, player2Score) => {
+socket.on('updateScore', (player1Score: number, player2Score: number, player1Id: string, player2Id: string) => {
+	const myId = socket.id
+	const scoreEl = document.querySelector('#score') as HTMLDivElement
 
-	let score1 = player1Score;
-	let score2 = player2Score;
-
-	const scoreEl = document.querySelector('#score') as HTMLDivElement;
-	scoreEl.innerText = `${score1} - ${score2}`;
+	if (player1Id === myId) {
+		scoreEl.innerText = `${player1Score} - ${player2Score}`
+	} else {
+		scoreEl.innerText = `${player2Score} - ${player1Score}`
+	}
 })
 
 export default socket
