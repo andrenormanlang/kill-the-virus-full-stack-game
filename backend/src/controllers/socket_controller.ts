@@ -167,44 +167,40 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 					if (latestReactionTimes[0]?.time && latestReactionTimes[1]?.time) {
 
-						// Should be always the winner 
+						// Should be always the winner because ordetBy time
 						const winner = latestReactionTimes[0].user!
-						// Shoudld be always the loser
+						// Shoudld be always the loser because ordetBy time
 						const loser = latestReactionTimes[1].user!
 						// const player2 = latestReactionTimes[1].user!
 						// const result = latestReactionTimes[0].time! - latestReactionTimes[1].time!
 						debug('winner:', winner)
 
-						const newScore = (winner.score!) + 1
-
 						await prisma.user.update({
 							where: {
 								id: winner.id
 							},
-							data: { score: winner.score! + 1 }
+							data: { score: (winner.score!) + 1 }
 						})
 
-						debug('Winner:', winner.score, winner.name, 'loser:', loser.score, loser.name)
+						const getPlayerScores = await prisma.user.findMany({
+							where: {
+								gameRoom: {
+									id: gameRoomId
+								}
+							},
+							select: {
+								id: true,
+								name: true,
+								score: true
+							}
+						})
 
-						// if (result > 0) {
-						// 	// player 2 has won
-						// 	const newScore = player2.score! + 1;
-						// 	await prisma.user.update({
-						// 		where: { id: player2.id },
-						// 		data: { score: newScore },
-						// 	});
-						// } else if (result < 0) {
-						// 	// player 1 has won
-						// 	const newScore = player1.score! + 1;
-						// 	await prisma.user.update({
-						// 		where: { id: player1.id },
-						// 		data: { score: newScore },
-						// 	});
-						// } else {
-						// 	// DRAW??
-						// }
+						const player1Score = getPlayerScores[0]?.score ?? 0;
+						const player2Score = getPlayerScores[1]?.score ?? 0;
 
-						// debug(`Player ${player1.name} score: ${player1.score}, Player ${player2.name} score: ${player2.score}`);
+						debug('players score:', getPlayerScores)
+
+						io.to(gameRoom.id).emit('updateScore', player1Score, player2Score)
 
 					}
 				} catch (err) {

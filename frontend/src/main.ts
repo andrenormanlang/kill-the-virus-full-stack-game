@@ -24,7 +24,7 @@ const spinnerEl = document.querySelector('#spinner') as HTMLFormElement
 let username: string | null = null
 
 // array for all 10 reaction times
-let reactionTime:any = []
+let reactionTime: any = []
 let timer: number
 
 // calculates the average reactionTime for all rounds
@@ -40,8 +40,8 @@ const averageReactionTime = () => {
 
 // Displays the virus do the DOM
 const displayVirus = (virusData: VirusData) => {
-	const { row, column, delay} = virusData
-	
+	const { row, column, delay } = virusData
+
 	setTimeout(() => {
 		(document.querySelector('#gameScreen') as HTMLDivElement).innerHTML = `
 			<div class="virus" id="virus" style="grid-row: ${row}; grid-column: ${column};">🦠</div>
@@ -65,8 +65,8 @@ socket.on('userJoinedGame', (username) => {
 
 toLobbyEl.addEventListener('submit', (e) => {
 	e.preventDefault
-	
-	socket.on ('reset', () => {
+
+	socket.on('reset', () => {
 		console.log('restarting game')
 	})
 })
@@ -108,7 +108,7 @@ usernameFormEl.addEventListener('submit', e => {
 	// Get username
 	username = (usernameFormEl.querySelector('#username-input') as HTMLInputElement).value.trim()
 	if (!username) return
-	
+
 	// socket.emit('userJoinedLobby', username)
 	socket.emit('userJoin', username)
 
@@ -126,6 +126,16 @@ usernameFormEl.addEventListener('submit', e => {
 
 		socket.emit('clickVirus', timeTakenToClick)
 	})
+})
+
+
+socket.on('updateScore', (player1Score, player2Score) => {
+
+	let score1 = player1Score;
+	let score2 = player2Score;
+
+	const scoreEl = document.querySelector('#score') as HTMLDivElement;
+	scoreEl.innerText = `${score1} - ${score2}`;
 })
 
 export default socket
