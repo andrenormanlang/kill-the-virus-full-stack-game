@@ -158,6 +158,23 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			})
 			debug('latestReactionTimes:', latestReactionTimes)
 
+			if (latestReactionTimes[0]?.time && latestReactionTimes[1]?.time) {
+
+				const player1 = latestReactionTimes[0].time
+				const player2 = latestReactionTimes[1].time
+				const result = player1 - player2
+				debug('fastestTime:', result)
+
+				if (result > 0) {
+					// player 2 has won 
+				} else if (result < 0) {
+					// player 1 has won
+				} else {
+					// DRAW??
+				}
+
+			}
+
 			// Reset virusClicked for each player
 			gameRoom.users.forEach(async (user) => {
 				await updateUsersVirusClicked(user.id, { virusClicked: false })
