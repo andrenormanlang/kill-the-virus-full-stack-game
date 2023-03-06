@@ -3,7 +3,7 @@
  */
 import Debug from 'debug'
 import { Socket } from 'socket.io'
-import { createUser, deleteUser, findUser, updateUsersVirusClicked } from '../services/user_service'
+import { createUser, deleteUser, findUser, updateScore, updateUsersVirusClicked } from '../services/user_service'
 import { ClientToServerEvents, NewRoundData, ServerToClientEvents } from '../types/shared/socket_types'
 import { io } from '../../server'
 import { createReactionTime, deleteReactionTimes, findReactionTimesByUserId, findReactionTimesByRoomId } from '../services/reactionTime_service'
@@ -68,6 +68,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 					id: socket.id,
 					name: username,
 					gameRoomId: gameRoom.id,
+					score: 0
 				})
 
 				socket.join(gameRoom.id)
@@ -79,6 +80,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 					id: socket.id,
 					name: username,
 					gameRoomId: existingRoom.id,
+					score: 0
 				})
 
 				await updateGameRoomsUserCount(existingRoom.id, { userCount: 2 })
@@ -143,38 +145,74 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			// Check if both players viruses are clicked
 			if (virusesGone !== gameRoom.userCount) return
 
-			const latestReactionTimes = await prisma.reactionTime.findMany({
-				where: {
-					user: {
-						gameRoomId: gameRoom.id
+			const updateScoresForGameRoom = async (gameRoomId: string) => {
+				try {
+					const latestReactionTimes = await prisma.reactionTime.findMany({
+						where: {
+							user: {
+								gameRoomId: gameRoomId
+							}
+						},
+						take: 2,
+						orderBy: [
+							{
+								time: 'asc'
+							}
+						],
+						include: {
+							user: true
+						}
+					})
+					debug('latestReactionTimes:', latestReactionTimes)
+
+					if (latestReactionTimes[0]?.time && latestReactionTimes[1]?.time) {
+
+						// Should be always the winner 
+						const winner = latestReactionTimes[0].user!
+						// Shoudld be always the loser
+						const loser = latestReactionTimes[1].user!
+						// const player2 = latestReactionTimes[1].user!
+						// const result = latestReactionTimes[0].time! - latestReactionTimes[1].time!
+						debug('winner:', winner)
+
+						const newScore = (winner.score!) + 1
+
+						await prisma.user.update({
+							where: {
+								id: winner.id
+							},
+							data: { score: winner.score! + 1 }
+						})
+
+						debug('Winner:', winner.score, winner.name, 'loser:', loser.score, loser.name)
+
+						// if (result > 0) {
+						// 	// player 2 has won
+						// 	const newScore = player2.score! + 1;
+						// 	await prisma.user.update({
+						// 		where: { id: player2.id },
+						// 		data: { score: newScore },
+						// 	});
+						// } else if (result < 0) {
+						// 	// player 1 has won
+						// 	const newScore = player1.score! + 1;
+						// 	await prisma.user.update({
+						// 		where: { id: player1.id },
+						// 		data: { score: newScore },
+						// 	});
+						// } else {
+						// 	// DRAW??
+						// }
+
+						// debug(`Player ${player1.name} score: ${player1.score}, Player ${player2.name} score: ${player2.score}`);
+
 					}
-				},
-				take: 2,
-				orderBy: [
-					{
-						id: 'desc'
-					}
-				]
-			})
-			debug('latestReactionTimes:', latestReactionTimes)
-
-			if (latestReactionTimes[0]?.time && latestReactionTimes[1]?.time) {
-
-				const player1 = latestReactionTimes[0]
-				const player2 = latestReactionTimes[1]
-				const result = player1.time! - player2.time!
-				debug('fastestTime:', result)
-
-				if (result > 0) {
-					// player 2 has won 
-
-				} else if (result < 0) {
-					// player 1 has won
-				} else {
-					// DRAW??
+				} catch (err) {
+					debug('Error updating scores:', err)
 				}
-
 			}
+
+			updateScoresForGameRoom(gameRoom.id)
 
 			// Reset virusClicked for each player
 			gameRoom.users.forEach(async (user) => {

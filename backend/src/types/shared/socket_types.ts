@@ -38,6 +38,7 @@ export interface UserData {
 	name: string
 	gameRoomId: string
 	virusClicked?: boolean
+	score: number
 }
 
 export interface VirusData {
