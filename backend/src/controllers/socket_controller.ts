@@ -117,11 +117,11 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 				return io.to(gameRoom.id).emit('endGame')
 			}
 
-			// // Save each players reaction time in the database
-			// await createReactionTime({
-			// 	time: timeTakenToClick,
-			// 	userId: user.id
-			// })
+			// Save each players reaction time in the database
+			await createReactionTime({
+				time: timeTakenToClick,
+				userId: user.id
+			})
 
 			socket.broadcast.to(gameRoom.id).emit('reactionTime', timeTakenToClick)
 

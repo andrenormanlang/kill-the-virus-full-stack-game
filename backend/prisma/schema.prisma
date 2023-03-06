@@ -14,17 +14,17 @@ model GameRoom {
 }
 
 model User {
-    id           String   @id @map("_id")
+    id           String         @id @map("_id")
     name         String
-    gameRoom     GameRoom @relation(fields: [gameRoomId], references: [id])
-    gameRoomId   String   @db.ObjectId
-    virusClicked Boolean? @default(false)
-    // reactionTime ReactionTime[]
+    gameRoom     GameRoom       @relation(fields: [gameRoomId], references: [id])
+    gameRoomId   String         @db.ObjectId
+    virusClicked Boolean?       @default(false)
+    reactionTime ReactionTime[]
 }
 
-// model ReactionTime {
-//     id     String  @id @default(auto()) @map("_id") @db.ObjectId
-//     time   Float?
-//     user   User?   @relation(fields: [userId], references: [id])
-//     userId String?
-// }
+model ReactionTime {
+    id     String  @id @default(auto()) @map("_id") @db.ObjectId
+    time   Float?
+    user   User?   @relation(fields: [userId], references: [id])
+    userId String?
+}
