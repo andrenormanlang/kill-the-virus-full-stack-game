@@ -20,6 +20,7 @@ model User {
     gameRoomId   String         @db.ObjectId
     virusClicked Boolean?       @default(false)
     reactionTime ReactionTime[]
+    score        Int            @default(0)
 }
 
 model ReactionTime {

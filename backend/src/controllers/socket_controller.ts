@@ -160,13 +160,14 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 			if (latestReactionTimes[0]?.time && latestReactionTimes[1]?.time) {
 
-				const player1 = latestReactionTimes[0].time
-				const player2 = latestReactionTimes[1].time
-				const result = player1 - player2
+				const player1 = latestReactionTimes[0]
+				const player2 = latestReactionTimes[1]
+				const result = player1.time! - player2.time!
 				debug('fastestTime:', result)
 
 				if (result > 0) {
 					// player 2 has won 
+
 				} else if (result < 0) {
 					// player 1 has won
 				} else {

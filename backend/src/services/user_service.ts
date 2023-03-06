@@ -19,6 +19,13 @@ export const updateUsersVirusClicked = (userId: string, virusClickedData: { viru
 	})
 }
 
+export const updateScore = (userId: string, score: { score: number }) => {
+	return prisma.user.update({
+		where: { id: userId },
+		data: score,
+	})
+}
+
 export const deleteUser = (userId: string) => {
 	return prisma.user.delete({ where: { id: userId } })
 }
