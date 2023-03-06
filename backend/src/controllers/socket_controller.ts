@@ -8,7 +8,7 @@ import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/sock
 import { io } from '../../server'
 import { createReactionTime, deleteReactionTimes, findReactionTimesByUserId, findReactionTimesByRoomId } from '../services/reactionTime_service'
 import { createGameRoom, deleteGameRoom, findGameRoomById, findGameRoomByUserCount, updateGameRoomsUserCount } from '../services/gameRoom_service'
-import { prisma } from '@prisma/client'
+import prisma from '../prisma'
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
