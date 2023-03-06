@@ -52,7 +52,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 		}
 	})
 
-	let round = 0
+	let round = 1
 
 	socket.on('userJoin', async (username) => {
 		try {
@@ -93,7 +93,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 					delay: virusData.delay,
 				}
 
-				io.to(existingRoom.id).emit('firstRound', firstRoundPayload)
+				io.to(existingRoom.id).emit('firstRound', firstRoundPayload, round)
 			}
 		}
 		catch (err) {

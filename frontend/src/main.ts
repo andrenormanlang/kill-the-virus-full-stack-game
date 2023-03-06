@@ -1,7 +1,7 @@
 import './assets/scss/style.scss'
 import './assets/ts/rounds'
 import { io, Socket } from 'socket.io-client'
-import { ClientToServerEvents, ServerToClientEvents } from '@backend/types/shared/socket_types'
+import { ClientToServerEvents, ServerToClientEvents, VirusData } from '@backend/types/shared/socket_types'
 
 const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOST)
@@ -25,6 +25,7 @@ let username: string | null = null
 
 // array for all 10 reaction times
 let reactionTime:any = []
+let timer: number
 
 // calculates the average reactionTime for all rounds
 const averageReactionTime = () => {
@@ -35,6 +36,19 @@ const averageReactionTime = () => {
 	let average = sum / reactionTime.length;
 	console.log(average)
 	return average
+}
+
+// Displays the virus do the DOM
+const displayVirus = (virusData: VirusData) => {
+	const { row, column, delay} = virusData
+	
+	setTimeout(() => {
+		(document.querySelector('#gameScreen') as HTMLDivElement).innerHTML = `
+			<div class="virus" id="virus" style="grid-row: ${row}; grid-column: ${column};">🦠</div>
+		`
+		// Start the timer
+		timer = Date.now() / 1000
+	}, delay)
 }
 
 socket.on('connect', () => {
@@ -62,7 +76,6 @@ socket.on('endGame', () => {
 	gameEl.style.display = 'none'
 	endGameBoardEl.style.display = 'block'
 	console.log('Game ended, goodbye.')
-	
 })
 
 socket.on('reactionTime', (reactionTime) => {
@@ -70,34 +83,20 @@ socket.on('reactionTime', (reactionTime) => {
 	(document.querySelector('#opponentTime') as HTMLDivElement).innerText = ` ${reactionTime}`
 })
 
-let timer: number
-
-socket.on('firstRound', (firstRoundData) => {
-	const { row, column, delay } = firstRoundData
+socket.on('firstRound', (firstRoundData, round) => {
+	console.log('Round:', round)
 	// Hide lobby and show game
 	lobbyEl.style.display = 'none';
 	gameEl.style.display = 'block'
 	spinnerEl.classList.remove('hide')
-	// console.log('Round:', round)
-
-	setTimeout(() => {
-		(document.querySelector('#gameScreen') as HTMLDivElement).innerHTML = `
-			<div class="virus" id="virus" style="grid-row: ${row}; grid-column: ${column};">🦠</div>
-		`
-		timer = Date.now() / 1000
-	}, delay)
+	displayVirus(firstRoundData)
 })
 
 socket.on('newRound', (newRoundData) => {
 	const { row, column, delay, round } = newRoundData
-		console.log('Round:', round)
+	console.log('Round:', round)
 
-	setTimeout(() => {
-		(document.querySelector('#gameScreen') as HTMLDivElement).innerHTML = `
-			<div class="virus" id="virus" style="grid-row: ${row}; grid-column: ${column};">🦠</div>
-		`
-		timer = Date.now() / 1000
-	}, delay)
+	displayVirus({ row, column, delay })
 })
 
 usernameFormEl.addEventListener('submit', e => {
