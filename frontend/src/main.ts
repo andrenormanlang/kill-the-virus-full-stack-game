@@ -63,18 +63,22 @@ socket.on('userJoinedGame', (username) => {
 	console.log(username, 'has joined the game')
 })
 
-toLobbyEl.addEventListener('submit', (e) => {
-	e.preventDefault
-	
-	socket.on ('reset', () => {
-		console.log('restarting game')
-	})
-})
 
 socket.on('endGame', () => {
 	lobbyEl.style.display = 'none'
 	gameEl.style.display = 'none'
 	endGameBoardEl.style.display = 'block'
+	
+	toLobbyEl.addEventListener('submit', (e) => {
+		e.preventDefault
+		
+		lobbyEl.style.display = 'block'
+		gameEl.style.display = 'none'
+		endGameBoardEl.style.display = 'none'
+		
+		// socket.emit('toLobby')
+	})
+	
 	console.log('Game ended, goodbye.')
 })
 

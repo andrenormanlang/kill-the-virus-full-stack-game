@@ -192,35 +192,30 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 			// Give the next virus to both players
 			io.to(gameRoom.id).emit('newRound', newRoundPayload)
+
 		}
 		catch (err) {
 			debug('ERROR clicking the virus!', err)
 		}
+
+		// socket.on('toLobby', async () => {
+
+		// 	debug('✌🏻 A user disconnected', socket.id)
+	
+		// 	try {
+		// 		const user = await findUser(socket.id)
+		// 		if (!user) return
+	
+		// 		const gameRoom = await findGameRoomById(user.gameRoomId)
+		// 		if (!gameRoom) return
+		// 		const deletedRoom = await deleteGameRoom(user.gameRoomId)
+		// 		debug('Room deleted:', deletedRoom)
+		// 	}
+		// 	catch (err) {
+		// 		debug('ERROR finding or deleting one of following: user, gameRoom')
+		// 	}
+		// })
 	})
 }
 
-export const restart = (socket: Socket<ServerToClientEvents>) => {
 
-	try {
-		socket.on('reset', async () => {
-			debug('✌🏻 A user disconnected', socket.id)
-			const user = await prisma.user.findUnique({
-				where: {
-					id: socket.id
-				}
-			})
-
-			if (!user) return
-
-			const deleteRoom = await prisma.gameRoom.delete({
-				where: {
-					id: user?.gameRoomId
-				}
-			})
-			console.log(deleteRoom)
-		})
-	} catch (err) {
-		debug('ERROR resetting', err)
-	}
-
-}
