@@ -8,6 +8,7 @@ import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/sock
 import { io } from '../../server'
 import { createReactionTime, deleteReactionTimes, findReactionTimesByUserId, findReactionTimesByRoomId } from '../services/reactionTime_service'
 import { createGameRoom, deleteGameRoom, findGameRoomById, findGameRoomByUserCount, updateGameRoomsUserCount } from '../services/gameRoom_service'
+import { prisma } from '@prisma/client'
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
@@ -112,7 +113,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			if (round > 10) {
 				// const allReactionTimes = await findReactionTimesByRoomId(gameRoom.id)
 				// debug('allReactionTimes:', allReactionTimes)
-				
+
 				return io.to(gameRoom.id).emit('endGame')
 			}
 
@@ -151,26 +152,26 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 }
 
 export const restart = (socket: Socket<ServerToClientEvents>) => {
-	
-	try{
+
+	try {
 		socket.on('reset', async () => {
 			debug('✌🏻 A user disconnected', socket.id)
-		const user = await prisma.user.findUnique({
-			where: {
-				id: socket.id
-			}
-		})
+			const user = await prisma.user.findUnique({
+				where: {
+					id: socket.id
+				}
+			})
 
-		if (!user) return
+			if (!user) return
 
-		const deleteRoom = await prisma.gameRoom.delete({
-			where: {
-				id: user?.gameRoomId
-			}
+			const deleteRoom = await prisma.gameRoom.delete({
+				where: {
+					id: user?.gameRoomId
+				}
+			})
+			console.log(deleteRoom)
 		})
-		console.log(deleteRoom)
-		})
-	} catch (err){
+	} catch (err) {
 		debug('ERROR resetting', err)
 	}
 
