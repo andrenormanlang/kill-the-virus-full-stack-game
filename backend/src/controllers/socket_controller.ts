@@ -178,7 +178,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			// Update the users virusClicked to 'true'
 			await updateUsersVirusClicked(user.id, { virusClicked: true })
 
-			const gameRoom = await findGameRoomById(user.gameRoomId)
+			let gameRoom = await findGameRoomById(user.gameRoomId)
 			if (!gameRoom) return
 
 			// Save each players reaction time in the database
@@ -208,10 +208,11 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 			updateScoresForGameRoom(gameRoom.id)
 
-			await prisma.gameRoom.update({
+			gameRoom = await prisma.gameRoom.update({
 				where: {
 					id: gameRoom.id
 				},
+				include: { users: true },
 				data: { roundCount: { increment: 1 } }
 			})
 
