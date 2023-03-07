@@ -4,10 +4,11 @@
 import Debug from 'debug'
 import { Socket } from 'socket.io'
 import { createUser, deleteUser, findUser, updateScore, updateUsersVirusClicked } from '../services/user_service'
-import { ClientToServerEvents, NewRoundData, ServerToClientEvents } from '../types/shared/socket_types'
+import { ClientToServerEvents, NewRoundData, ServerToClientEvents, UserData } from '../types/shared/socket_types'
 import { io } from '../../server'
 import { createReactionTime, deleteReactionTimes, findReactionTimesByUserId, findReactionTimesByRoomId } from '../services/reactionTime_service'
 import { createGameRoom, deleteGameRoom, findGameRoomById, findGameRoomByUserCount, updateGameRoomsUserCount } from '../services/gameRoom_service'
+import { ReactionTime } from "@prisma/client"
 import prisma from '../prisma'
 
 // Create a new debug instance
@@ -89,6 +90,10 @@ const updateScoresForGameRoom = async (gameRoomId: string) => {
 		debug('Error updating scores:', err)
 	}
 
+}
+
+const averageReactionTime = (reactionTimes: ReactionTime[]) => {
+	return reactionTimes.map((reactionTime) => reactionTime.time!).reduce((sum, value) => sum + value, 0) / reactionTimes.length
 }
 
 // Handle the user connecting
@@ -220,8 +225,38 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			if (gameRoom.roundCount > 10) {
 				// const allReactionTimes = await findReactionTimesByRoomId(gameRoom.id)
 				// debug('allReactionTimes:', allReactionTimes)
+				const player1ReactionTimes = await prisma.reactionTime.findMany({
+					where: {
+						userId: gameRoom.users[0].id
+					}
+				})
 
-				io.to(gameRoom.id).emit('endGame')
+				const player2ReactionTimes = await prisma.reactionTime.findMany({
+					where: {
+						userId: gameRoom.users[1].id
+					}
+				})
+
+				const player1AverageReactionTime = averageReactionTime(player1ReactionTimes)
+				const player2AverageReactionTime = averageReactionTime(player2ReactionTimes)
+
+				const userData1: UserData = {
+					id: gameRoom.users[0].id,
+					name: gameRoom.users[0].name,
+					gameRoomId: gameRoom.id,
+					score: gameRoom.users[0].score!,
+					averageReactionTime: player1AverageReactionTime
+				}
+
+				const userData2: UserData = {
+					id: gameRoom.users[1].id,
+					name: gameRoom.users[1].name,
+					gameRoomId: gameRoom.id,
+					score: gameRoom.users[1].score!,
+					averageReactionTime: player2AverageReactionTime
+				}
+
+				io.to(gameRoom.id).emit('endGame', userData1, userData2)
 			} else {
 				// Get the virus information
 				const virusData = calcVirusData()

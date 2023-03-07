@@ -1,5 +1,5 @@
 /**
- * gameRoom Sercive
+ * gameRoom Servive
  */
 import prisma from '../prisma'
 import { GameRoomData } from '../types/shared/socket_types'

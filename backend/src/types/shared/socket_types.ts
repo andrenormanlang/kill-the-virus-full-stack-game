@@ -12,7 +12,7 @@ export interface ServerToClientEvents {
 	newRound: (newRoundData: NewRoundData) => void
 	userJoinedGame: (username: string) => void
 	roomAvailable: (room: GameRoom) => void
-	endGame: () => void
+	endGame: (userData1: UserData, userData2: UserData) => void
 	reactionTime: (reactionTime: number) => void
 	reset: () => void
 	updateScore: (player1Score: number, player2Score: number, player1Id: string, player2Id: string) => void
@@ -41,6 +41,7 @@ export interface UserData {
 	gameRoomId: string
 	virusClicked?: boolean
 	score: number
+	averageReactionTime?: number
 }
 
 export interface VirusData {
