@@ -29,6 +29,7 @@ let username: string | null = null
 // array for all 10 reaction times
 // let reactionTime: any = []
 let timer: number
+let newTimer = 0.00
 
 // // calculates the average reactionTime for all rounds
 // const averageReactionTime = () => {
@@ -41,6 +42,22 @@ let timer: number
 // 	return average
 // }
 
+const startTimer = (start: boolean) => {
+	newTimer = 0.00
+
+	const timerInterval = setInterval(() => {
+		newTimer = Number((newTimer + 0.01).toFixed(2));
+		(document.querySelector('#liveTimer') as HTMLHeadingElement).innerText = `${newTimer}`
+	}, 10)
+
+	if (!start) {
+		clearInterval(timerInterval);
+		(document.querySelector('#liveTimer') as HTMLHeadingElement).innerText = `${newTimer}`
+	}
+
+	return newTimer
+}
+
 // Displays the virus do the DOM
 const displayVirus = (virusData: VirusData) => {
 	const { row, column, delay } = virusData
@@ -51,6 +68,7 @@ const displayVirus = (virusData: VirusData) => {
 		`
 		// Start the timer
 		timer = Date.now() / 1000
+		startTimer(false)
 	}, delay)
 }
 
@@ -75,14 +93,6 @@ socket.on('hello', () => {
 
 socket.on('userJoinedGame', (username) => {
 	console.log(username, 'has joined the game')
-})
-
-toLobbyEl.addEventListener('submit', (e) => {
-	e.preventDefault
-
-	socket.on('reset', () => {
-		console.log('restarting game')
-	})
 })
 
 socket.on('endGame', (userData1: UserData, userData2: UserData) => {
@@ -147,21 +157,22 @@ usernameFormEl.addEventListener('submit', e => {
 
 	// socket.emit('userJoinedLobby', username)
 	socket.emit('userJoin', username)
+})
 
-	// Eventlistener when clicking the virus
-	gameScreenEl.addEventListener("click", e => {
-		const target = e.target as HTMLElement
+// Eventlistener when clicking the virus
+gameScreenEl.addEventListener("click", e => {
+	const target = e.target as HTMLElement
+	if (!target.classList.contains('virus')) return
 
-		if (!target.classList.contains('virus')) return
+	(document.querySelector('#virus') as HTMLDivElement).remove()
+	
+	startTimer(true)
 
-		(document.querySelector('#virus') as HTMLDivElement).remove()
+	const timeTakenToClick = Number((Date.now() / 1000 - timer).toFixed(2))
+	console.log('My time:', timeTakenToClick);
+	(document.querySelector('#myTime') as HTMLDivElement).innerText = ` ${timeTakenToClick}`
 
-		const timeTakenToClick = Number((Date.now() / 1000 - timer).toFixed(3))
-		console.log('My time:', timeTakenToClick);
-		(document.querySelector('#myTime') as HTMLDivElement).innerText = ` ${timeTakenToClick}`
-
-		socket.emit('clickVirus', timeTakenToClick)
-	})
+	socket.emit('clickVirus', timeTakenToClick)
 })
 
 
