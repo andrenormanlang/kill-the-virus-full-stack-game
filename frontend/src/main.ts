@@ -94,7 +94,13 @@ socket.on('liveScoreAndUsername', (player1Username, player1Score, player2Usernam
 
 		gameList.innerHTML += gameListItem
 	}
+})
 
+socket.on('removeLi', (gameRoomId) => {
+	const listItemToRemove = document.getElementById(gameRoomId)
+	if (listItemToRemove) {
+		listItemToRemove.remove()
+	}
 })
 
 socket.on('endGame', (userData1: UserData, userData2: UserData) => {
