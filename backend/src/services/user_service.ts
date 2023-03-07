@@ -19,7 +19,12 @@ export const updateUsersVirusClicked = (userId: string, virusClickedData: { viru
 	})
 }
 
-export const updateScore = (userId: string, score: { score: number }) => {
+export const updateScore = (userId: string | null, score: { score: number }) => {
+
+	if (!userId) {
+		throw new Error('User ID is null')
+	}
+
 	return prisma.user.update({
 		where: { id: userId },
 		data: score,

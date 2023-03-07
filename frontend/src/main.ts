@@ -1,7 +1,7 @@
 import './assets/scss/style.scss'
 import './assets/ts/rounds'
 import { io, Socket } from 'socket.io-client'
-import { ClientToServerEvents, ServerToClientEvents, VirusData } from '@backend/types/shared/socket_types'
+import { ClientToServerEvents, ServerToClientEvents, UserData, VirusData } from '@backend/types/shared/socket_types'
 
 const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOST)
@@ -18,30 +18,33 @@ const gameEl = document.querySelector('#game') as HTMLDivElement
 const gameScreenEl = document.querySelector("#gameScreen") as HTMLDivElement
 const lobbyEl = document.querySelector('#lobby') as HTMLDivElement
 const endGameBoardEl = document.querySelector('#endGameBoard') as HTMLDivElement
+const winnerEl = document.querySelector('#winner') as HTMLDivElement
+const yourReactionTimeEl = document.querySelector('#yourReactionTime') as HTMLDivElement
+const opponentReactionTimeEl = document.querySelector('#opponentReactionTime') as HTMLDivElement
 const spinnerEl = document.querySelector('#spinner') as HTMLFormElement
 
 // User details
 let username: string | null = null
 
 // array for all 10 reaction times
-let reactionTime:any = []
+// let reactionTime: any = []
 let timer: number
 
-// calculates the average reactionTime for all rounds
-const averageReactionTime = () => {
-	let sum = 0;
-	for (let i = 0; i < reactionTime.length; i++) {
-		sum += reactionTime[i];
-	}
-	let average = sum / reactionTime.length;
-	console.log(average)
-	return average
-}
+// // calculates the average reactionTime for all rounds
+// const averageReactionTime = () => {
+// 	let sum = 0;
+// 	for (let i = 0; i < reactionTime.length; i++) {
+// 		sum += reactionTime[i];
+// 	}
+// 	let average = sum / reactionTime.length;
+// 	console.log(average)
+// 	return average
+// }
 
 // Displays the virus do the DOM
 const displayVirus = (virusData: VirusData) => {
-	const { row, column, delay} = virusData
-	
+	const { row, column, delay } = virusData
+
 	setTimeout(() => {
 		(document.querySelector('#gameScreen') as HTMLDivElement).innerHTML = `
 			<div class="virus" id="virus" style="grid-row: ${row}; grid-column: ${column};">🦠</div>
@@ -74,13 +77,29 @@ socket.on('userJoinedGame', (username) => {
 	console.log(username, 'has joined the game')
 })
 
+toLobbyEl.addEventListener('submit', (e) => {
+	e.preventDefault
 
-socket.on('endGame', () => {
+	socket.on('reset', () => {
+		console.log('restarting game')
+	})
+})
+
+socket.on('endGame', (userData1: UserData, userData2: UserData) => {
 	lobbyEl.style.display = 'none'
 	gameEl.style.display = 'none'
 	endGameBoardEl.style.display = 'block'
-	
-	
+
+	winnerEl.innerHTML = userData1.averageReactionTime! < userData2.averageReactionTime! ? userData1.name : userData2.name
+
+	if (userData1.id === socket.id) {
+		yourReactionTimeEl.innerHTML = `Your reaction time: ` + userData1.averageReactionTime!.toFixed(2)
+		opponentReactionTimeEl.innerHTML = `Opponent reaction time: ` + userData2.averageReactionTime!.toFixed(2)
+	} else {
+		yourReactionTimeEl.innerHTML = `Your reaction time: ` + userData2.averageReactionTime!.toFixed(2)
+		opponentReactionTimeEl.innerHTML = `Opponent reaction time: ` + userData1.averageReactionTime!.toFixed(2)
+	}
+
 	console.log('Game ended, goodbye.')
 })
 
@@ -105,6 +124,17 @@ socket.on('newRound', (newRoundData) => {
 	displayVirus({ row, column, delay })
 })
 
+socket.on('updateScore', (player1Score: number, player2Score: number, player1Id: string, player2Id: string) => {
+	const myId = socket.id
+	const scoreEl = document.querySelector('#score') as HTMLDivElement;
+
+	if (player1Id === myId) {
+		scoreEl.innerText = `${player1Score} - ${player2Score}`
+	} else {
+		scoreEl.innerText = `${player2Score} - ${player1Score}`
+	}
+})
+
 usernameFormEl.addEventListener('submit', e => {
 	e.preventDefault();
 
@@ -114,7 +144,7 @@ usernameFormEl.addEventListener('submit', e => {
 	// Get username
 	username = (usernameFormEl.querySelector('#username-input') as HTMLInputElement).value.trim()
 	if (!username) return
-	
+
 	// socket.emit('userJoinedLobby', username)
 	socket.emit('userJoin', username)
 
@@ -133,5 +163,6 @@ usernameFormEl.addEventListener('submit', e => {
 		socket.emit('clickVirus', timeTakenToClick)
 	})
 })
+
 
 export default socket
