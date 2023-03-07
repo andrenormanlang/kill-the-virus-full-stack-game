@@ -28,7 +28,7 @@ let username: string | null = null
 
 // array for all 10 reaction times
 // let reactionTime: any = []
-let timer: number
+let timer = 0.00
 let newTimer = 0.00
 
 // // calculates the average reactionTime for all rounds
@@ -42,21 +42,25 @@ let newTimer = 0.00
 // 	return average
 // }
 
+let count = 0.00;
+
 const startTimer = (start: boolean) => {
-	newTimer = 0.00
 
-	const timerInterval = setInterval(() => {
-		newTimer = Number((newTimer + 0.01).toFixed(2));
-		(document.querySelector('#liveTimer') as HTMLHeadingElement).innerText = `${newTimer}`
-	}, 10)
+	const startTime = Date.now();
 
-	if (!start) {
-		clearInterval(timerInterval);
-		(document.querySelector('#liveTimer') as HTMLHeadingElement).innerText = `${newTimer}`
+
+	if (start) {
+		timer = setInterval(() => {
+			count = Number(((Date.now() - startTime) / 1000).toFixed(3))
+			const liveTimerEl = document.querySelector('#liveTimer');
+			if (liveTimerEl) {
+				liveTimerEl.textContent = count.toString();
+			}
+		}, 10);
+	} else {
+		clearInterval(timer);
 	}
-
-	return newTimer
-}
+};
 
 // Displays the virus do the DOM
 const displayVirus = (virusData: VirusData) => {
@@ -68,7 +72,7 @@ const displayVirus = (virusData: VirusData) => {
 		`
 		// Start the timer
 		timer = Date.now() / 1000
-		startTimer(false)
+		startTimer(true)
 	}, delay)
 }
 
@@ -191,10 +195,12 @@ gameScreenEl.addEventListener("click", e => {
 	if (!target.classList.contains('virus')) return
 
 	(document.querySelector('#virus') as HTMLDivElement).remove()
-	
-	startTimer(true)
 
-	const timeTakenToClick = Number((Date.now() / 1000 - timer).toFixed(2))
+	startTimer(false)
+
+
+
+	const timeTakenToClick = count
 	console.log('My time:', timeTakenToClick);
 	(document.querySelector('#myTime') as HTMLDivElement).innerText = ` ${timeTakenToClick}`
 
