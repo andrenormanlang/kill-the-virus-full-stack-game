@@ -32,6 +32,7 @@ export interface ReactionTimeData {
 
 export interface GameRoomData {
 	userCount: number
+	roundCount: number
 }
 
 export interface UserData {
