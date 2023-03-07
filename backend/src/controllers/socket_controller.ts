@@ -82,9 +82,14 @@ const updateScoresForGameRoom = async (gameRoomId: string) => {
 			const player1Id = getPlayerScores[0]?.id
 			const player2Id = getPlayerScores[1]?.id
 
+			const player1Username = getPlayerScores[0]?.name
+			const player2Username = getPlayerScores[1]?.name
+
 			debug('players score:', getPlayerScores)
 
 			io.to(gameRoomId).emit('updateScore', player1Score, player2Score, player1Id, player2Id)
+
+			io.emit('liveScoreAndUsername', player1Username, player1Score, player2Username, player2Score, gameRoomId);
 
 		}
 	} catch (err) {

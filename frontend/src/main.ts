@@ -57,12 +57,12 @@ const displayVirus = (virusData: VirusData) => {
 toLobbyEl.addEventListener('click', () => {
 
 	socket.emit('toLobby')
-	
+
 	lobbyEl.style.display = 'block'
 	gameEl.style.display = 'none'
 	endGameBoardEl.style.display = 'none'
 	location.reload()
-	
+
 })
 
 socket.on('connect', () => {
@@ -79,10 +79,22 @@ socket.on('userJoinedGame', (username) => {
 
 toLobbyEl.addEventListener('submit', (e) => {
 	e.preventDefault
+})
 
-	socket.on('reset', () => {
-		console.log('restarting game')
-	})
+socket.on('liveScoreAndUsername', (player1Username, player1Score, player2Username, player2Score, gameRoomId) => {
+
+	const gameList = document.getElementById("gameList") as HTMLUListElement
+
+	const gameListItem = `<li id="${gameRoomId}"> ${player1Username} ${player1Score} : ${player2Score} ${player2Username}</li>`
+
+	const existingGameListItem = document.getElementById(gameRoomId)
+	if (existingGameListItem) {
+		existingGameListItem.innerHTML = `${player1Username} ${player1Score} : ${player2Score} ${player2Username}`
+	} else {
+
+		gameList.innerHTML += gameListItem
+	}
+
 })
 
 socket.on('endGame', (userData1: UserData, userData2: UserData) => {

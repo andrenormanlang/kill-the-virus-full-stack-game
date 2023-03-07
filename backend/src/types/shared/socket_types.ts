@@ -15,6 +15,7 @@ export interface ServerToClientEvents {
 	endGame: (userData1: UserData, userData2: UserData) => void
 	reactionTime: (reactionTime: number) => void
 	updateScore: (player1Score: number, player2Score: number, player1Id: string, player2Id: string) => void
+	liveScoreAndUsername: (player1Username: string, player1Score: number, player2Username: string, player2Score: number, gameRoomId: string) => void
 }
 
 // Events emitted by the client to the server
