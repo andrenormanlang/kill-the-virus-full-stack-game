@@ -30,3 +30,12 @@ model ReactionTime {
     user   User?   @relation(fields: [userId], references: [id])
     userId String?
 }
+
+model TenLatestGames {
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
+    player1      String
+    player2      String
+    player1Score Int
+    player2Score Int
+    date         DateTime @default(now())
+}

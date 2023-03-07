@@ -17,6 +17,12 @@ export interface ServerToClientEvents {
 	updateScore: (player1Score: number, player2Score: number, player1Id: string, player2Id: string) => void
 	liveScoreAndUsername: (player1Username: string, player1Score: number, player2Username: string, player2Score: number, gameRoomId: string) => void
 	removeLi: (gameRoomId: string) => void
+	tenLatestGames: (latestGame: {
+		player1: string;
+		player2: string;
+		player1Score: number;
+		player2Score: number;
+	}[]) => void;
 }
 
 // Events emitted by the client to the server

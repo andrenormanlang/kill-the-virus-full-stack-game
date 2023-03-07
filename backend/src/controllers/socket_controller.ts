@@ -106,6 +106,17 @@ const averageReactionTime = (reactionTimes: ReactionTime[]) => {
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
 	debug('🙋🏼 A user connected -', socket.id)
 
+	const getLatestGames = async () => {
+		const latestGames = await prisma.tenLatestGames.findMany({
+			orderBy: { date: 'desc' }
+		})
+
+		io.emit('tenLatestGames', latestGames)
+	}
+
+	getLatestGames()
+
+
 	// Handle user disconnecting
 	socket.on('disconnect', async () => {
 		debug('✌🏻 A user disconnected', socket.id)
@@ -302,6 +313,22 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 			// const deletedUser = await deleteUser(user.id)
 			// debug('User deleted:', deletedUser.name)
+
+
+			const theGameRoom = await findGameRoomById(user.gameRoomId);
+			if (!theGameRoom) return;
+
+			const player1 = theGameRoom.users[0];
+			const player2 = theGameRoom.users[1];
+
+			const tenLatestGame = await prisma.tenLatestGames.create({
+				data: {
+					player1: player1.name,
+					player2: player2.name,
+					player1Score: player1.score || 0,
+					player2Score: player2.score || 0,
+				},
+			});
 
 			const gameRoom = await findGameRoomById(user.gameRoomId)
 			if (!gameRoom) return

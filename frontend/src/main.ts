@@ -81,6 +81,19 @@ toLobbyEl.addEventListener('submit', (e) => {
 	e.preventDefault
 })
 
+const reactionList = document.getElementById('reactionList');
+
+socket.on('tenLatestGames', (latestGames) => {
+	// Handle the latestGames data here
+	console.log('Latest games:', latestGames)
+
+	latestGames.forEach(game => {
+		const li = document.createElement('li')
+		li.textContent += `${game.player1} ${game.player1Score} : ${game.player2} ${game.player2Score}`
+		reactionList!.appendChild(li)
+	})
+});
+
 socket.on('liveScoreAndUsername', (player1Username, player1Score, player2Username, player2Score, gameRoomId) => {
 
 	const gameList = document.getElementById("gameList") as HTMLUListElement
