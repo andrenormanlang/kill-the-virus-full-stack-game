@@ -14,7 +14,6 @@ export interface ServerToClientEvents {
 	roomAvailable: (room: GameRoom) => void
 	endGame: (userData1: UserData, userData2: UserData) => void
 	reactionTime: (reactionTime: number) => void
-	reset: () => void
 	updateScore: (player1Score: number, player2Score: number, player1Id: string, player2Id: string) => void
 }
 
@@ -23,6 +22,7 @@ export interface ClientToServerEvents {
 	// userJoinedLobby: (username: string) => void
 	userJoin: (username: string) => void
 	clickVirus: (timeTakenToClick: number) => void
+	toLobby: () => void
 }
 
 export interface ReactionTimeData {

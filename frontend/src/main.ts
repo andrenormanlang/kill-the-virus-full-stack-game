@@ -54,6 +54,17 @@ const displayVirus = (virusData: VirusData) => {
 	}, delay)
 }
 
+toLobbyEl.addEventListener('click', () => {
+
+	socket.emit('toLobby')
+	
+	lobbyEl.style.display = 'block'
+	gameEl.style.display = 'none'
+	endGameBoardEl.style.display = 'none'
+	location.reload()
+	
+})
+
 socket.on('connect', () => {
 	console.log('Connected to server')
 })

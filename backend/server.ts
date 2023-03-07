@@ -27,6 +27,11 @@ export const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpSer
  */
 io.on('connection', (socket) => {
 	handleConnection(socket)
+	
+})
+
+io.on('disconnect', () => {
+	
 })
 
 /**
