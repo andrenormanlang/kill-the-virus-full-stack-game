@@ -256,6 +256,10 @@ main {
 	color: #fff;
 	font-family: 'Orbitron', sans-serif;
 	border-left: #32cd32 2px solid;
+
+	#liveTimer {
+		color: #fff;
+	}
 }
   
 .scoreHeader {
@@ -308,4 +312,15 @@ main {
 	font-family: 'Orbitron', sans-serif;
 	text-align: center;
 
+}
+
+#gameList li {
+	background-color: #6b6d6b;
+	border: #111 2px solid;
+	color: #111;
+	font-family: 'Orbitron', sans-serif;
+	height: 23px;
+	width: 200px;
+	transition: 0.5s;
+	text-align: center;
 }

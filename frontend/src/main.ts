@@ -28,7 +28,8 @@ let username: string | null = null
 
 // array for all 10 reaction times
 // let reactionTime: any = []
-let timer: number
+let timer = 0.00
+let newTimer = 0.00
 
 // // calculates the average reactionTime for all rounds
 // const averageReactionTime = () => {
@@ -41,6 +42,26 @@ let timer: number
 // 	return average
 // }
 
+let count = 0.00;
+
+const startTimer = (start: boolean) => {
+
+	const startTime = Date.now();
+
+
+	if (start) {
+		timer = setInterval(() => {
+			count = Number(((Date.now() - startTime) / 1000).toFixed(3))
+			const liveTimerEl = document.querySelector('#liveTimer');
+			if (liveTimerEl) {
+				liveTimerEl.textContent = count.toString();
+			}
+		}, 10);
+	} else {
+		clearInterval(timer);
+	}
+};
+
 // Displays the virus do the DOM
 const displayVirus = (virusData: VirusData) => {
 	const { row, column, delay } = virusData
@@ -51,18 +72,19 @@ const displayVirus = (virusData: VirusData) => {
 		`
 		// Start the timer
 		timer = Date.now() / 1000
+		startTimer(true)
 	}, delay)
 }
 
 toLobbyEl.addEventListener('click', () => {
 
 	socket.emit('toLobby')
-	
+
 	lobbyEl.style.display = 'block'
 	gameEl.style.display = 'none'
 	endGameBoardEl.style.display = 'none'
 	location.reload()
-	
+
 })
 
 socket.on('connect', () => {
@@ -79,10 +101,28 @@ socket.on('userJoinedGame', (username) => {
 
 toLobbyEl.addEventListener('submit', (e) => {
 	e.preventDefault
+})
 
-	socket.on('reset', () => {
-		console.log('restarting game')
-	})
+socket.on('liveScoreAndUsername', (player1Username, player1Score, player2Username, player2Score, gameRoomId) => {
+
+	const gameList = document.getElementById("gameList") as HTMLUListElement
+
+	const gameListItem = `<li id="${gameRoomId}"> ${player1Username} ${player1Score} : ${player2Score} ${player2Username}</li>`
+
+	const existingGameListItem = document.getElementById(gameRoomId)
+	if (existingGameListItem) {
+		existingGameListItem.innerHTML = `${player1Username} ${player1Score} : ${player2Score} ${player2Username}`
+	} else {
+
+		gameList.innerHTML += gameListItem
+	}
+})
+
+socket.on('removeLi', (gameRoomId) => {
+	const listItemToRemove = document.getElementById(gameRoomId)
+	if (listItemToRemove) {
+		listItemToRemove.remove()
+	}
 })
 
 socket.on('endGame', (userData1: UserData, userData2: UserData) => {
@@ -147,21 +187,24 @@ usernameFormEl.addEventListener('submit', e => {
 
 	// socket.emit('userJoinedLobby', username)
 	socket.emit('userJoin', username)
+})
 
-	// Eventlistener when clicking the virus
-	gameScreenEl.addEventListener("click", e => {
-		const target = e.target as HTMLElement
+// Eventlistener when clicking the virus
+gameScreenEl.addEventListener("click", e => {
+	const target = e.target as HTMLElement
+	if (!target.classList.contains('virus')) return
 
-		if (!target.classList.contains('virus')) return
+	(document.querySelector('#virus') as HTMLDivElement).remove()
 
-		(document.querySelector('#virus') as HTMLDivElement).remove()
+	startTimer(false)
 
-		const timeTakenToClick = Number((Date.now() / 1000 - timer).toFixed(3))
-		console.log('My time:', timeTakenToClick);
-		(document.querySelector('#myTime') as HTMLDivElement).innerText = ` ${timeTakenToClick}`
 
-		socket.emit('clickVirus', timeTakenToClick)
-	})
+
+	const timeTakenToClick = count
+	console.log('My time:', timeTakenToClick);
+	(document.querySelector('#myTime') as HTMLDivElement).innerText = ` ${timeTakenToClick}`
+
+	socket.emit('clickVirus', timeTakenToClick)
 })
 
 
