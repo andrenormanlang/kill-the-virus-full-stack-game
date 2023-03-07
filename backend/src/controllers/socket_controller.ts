@@ -82,9 +82,14 @@ const updateScoresForGameRoom = async (gameRoomId: string) => {
 			const player1Id = getPlayerScores[0]?.id
 			const player2Id = getPlayerScores[1]?.id
 
+			const player1Username = getPlayerScores[0]?.name
+			const player2Username = getPlayerScores[1]?.name
+
 			debug('players score:', getPlayerScores)
 
 			io.to(gameRoomId).emit('updateScore', player1Score, player2Score, player1Id, player2Id)
+
+			io.emit('liveScoreAndUsername', player1Username, player1Score, player2Username, player2Score, gameRoomId);
 
 		}
 	} catch (err) {
@@ -109,6 +114,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			const user = await findUser(socket.id)
 			if (!user) return
 
+			io.emit('removeLi', user.gameRoomId)
+
 			const reactionTimes = await findReactionTimesByUserId(user.id)
 			if (!reactionTimes) return
 			const deletedReactionTimes = await deleteReactionTimes(user.id)
@@ -121,6 +128,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			if (!gameRoom) return
 			const deletedRoom = await deleteGameRoom(user.gameRoomId)
 			debug('Room deleted:', deletedRoom)
+
 		}
 		catch (err) {
 			debug('ERROR finding or deleting one of following: reactionTimes, user, gameRoom')
@@ -258,6 +266,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 				}
 
 				io.to(gameRoom.id).emit('endGame', userData1, userData2)
+
+				io.emit('removeLi', user.gameRoomId)
 			} else {
 				// Get the virus information
 				const virusData = calcVirusData()
