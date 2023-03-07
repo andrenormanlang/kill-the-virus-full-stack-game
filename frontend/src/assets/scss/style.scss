@@ -1,10 +1,10 @@
 // General Rules
 body {
-	font-family: Arial, sans-serif;
 	margin: 0;
 	padding: 0;
 	background-color: #111;
 	font-family: 'Orbitron', sans-serif;
+	color: #fff;
 }
 
 header {
@@ -255,6 +255,10 @@ main {
 	color: #fff;
 	font-family: 'Orbitron', sans-serif;
 	border-left: #32cd32 2px solid;
+
+	#liveTimer {
+		color: #fff;
+	}
 }
   
 .scoreHeader {
