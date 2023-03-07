@@ -99,6 +99,18 @@ socket.on('newRound', (newRoundData) => {
 	displayVirus({ row, column, delay })
 })
 
+socket.on('updateScore', (player1Score: number, player2Score: number, player1Id: string, player2Id: string) => {
+	const myId = socket.id
+	const scoreEl = document.querySelector('#score') as HTMLDivElement;
+	console.log('Score %d - %d', player1Score, player2Score);
+
+	if (player1Id === myId) {
+		scoreEl.innerText = `${player1Score} - ${player2Score}`
+	} else {
+		scoreEl.innerText = `${player2Score} - ${player1Score}`
+	}
+})
+
 usernameFormEl.addEventListener('submit', e => {
 	e.preventDefault();
 
@@ -128,16 +140,5 @@ usernameFormEl.addEventListener('submit', e => {
 	})
 })
 
-
-socket.on('updateScore', (player1Score: number, player2Score: number, player1Id: string, player2Id: string) => {
-	const myId = socket.id
-	const scoreEl = document.querySelector('#score') as HTMLDivElement
-
-	if (player1Id === myId) {
-		scoreEl.innerText = `${player1Score} - ${player2Score}`
-	} else {
-		scoreEl.innerText = `${player2Score} - ${player1Score}`
-	}
-})
 
 export default socket
