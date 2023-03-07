@@ -209,13 +209,13 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			const user = await findUser(socket.id)
 			if (!user) return
 
-			const reactionTimes = await findReactionTimesByUserId(user.id)
-			if (!reactionTimes) return
-			const deletedReactionTimes = await deleteReactionTimes(user.id)
-			debug('Reaction times deleted:', deletedReactionTimes)
+			// const reactionTimes = await findReactionTimesByUserId(user.id)
+			// if (!reactionTimes) return
+			// const deletedReactionTimes = await deleteReactionTimes(user.id)
+			// debug('Reaction times deleted:', deletedReactionTimes)
 
-			const deletedUser = await deleteUser(user.id)
-			debug('User deleted:', deletedUser.name)
+			// const deletedUser = await deleteUser(user.id)
+			// debug('User deleted:', deletedUser.name)
 
 			const gameRoom = await findGameRoomById(user.gameRoomId)
 			if (!gameRoom) return

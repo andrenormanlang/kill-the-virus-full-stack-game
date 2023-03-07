@@ -30,6 +30,10 @@ io.on('connection', (socket) => {
 	
 })
 
+io.on('disconnect', () => {
+	
+})
+
 /**
  * Listen on provided port, on all network interfaces.
  */
