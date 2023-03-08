@@ -141,7 +141,7 @@ socket.on('removeLi', (gameRoomId) => {
 socket.on('endGame', (userData1: UserData, userData2: UserData) => {
 	lobbyEl.style.display = 'none'
 	gameEl.style.display = 'none'
-	endGameBoardEl.style.display = 'block'
+	endGameBoardEl.style.display = 'flex'
 
 	winnerEl.innerHTML = userData1.averageReactionTime! < userData2.averageReactionTime! ? userData1.name : userData2.name
 
