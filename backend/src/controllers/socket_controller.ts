@@ -27,48 +27,25 @@ const calcVirusData = () => {
 const updateScoresForGameRoom = async (gameRoomId: string) => {
 	try {
 		const latestReactionTimes = await prisma.reactionTime.findMany({
-			where: {
-				user: {
-					gameRoomId: gameRoomId
-				}
-			},
+			where: { user: { gameRoomId: gameRoomId } },
 			take: 2,
-			orderBy: [
-				{
-					id: 'desc'
-				}
-			],
-			include: {
-				user: true
-			}
+			orderBy: { id: 'desc' },
+			include: { user: true }
 		})
 		debug('latestReactionTimes:', latestReactionTimes)
 
-		if (latestReactionTimes[0]?.time && latestReactionTimes[1]?.time) {
-
-			latestReactionTimes.sort((reactionTime1, reactionTime2) => reactionTime1.time! - reactionTime2.time!)
-
-			// Should be always the winner because ordetBy time
-			const winner = latestReactionTimes[0].user!
-			// Shoudld be always the loser because ordetBy time
-			const loser = latestReactionTimes[1].user!
-			// const player2 = latestReactionTimes[1].user!
-			// const result = latestReactionTimes[0].time! - latestReactionTimes[1].time!
+		if (latestReactionTimes[0].time && latestReactionTimes[1].time) {
+			// Should be always the winner because sort by time
+			const winner = latestReactionTimes.sort((reactionTime1, reactionTime2) => reactionTime1.time! - reactionTime2.time!)[0].user!
 			debug('winner:', winner)
 
 			await prisma.user.update({
-				where: {
-					id: winner.id
-				},
+				where: { id: winner.id },
 				data: { score: { increment: 1 } }
 			})
 
 			const getPlayerScores = await prisma.user.findMany({
-				where: {
-					gameRoom: {
-						id: gameRoomId
-					}
-				},
+				where: { gameRoom: { id: gameRoomId } },
 				select: {
 					id: true,
 					name: true,
@@ -99,7 +76,9 @@ const updateScoresForGameRoom = async (gameRoomId: string) => {
 }
 
 const averageReactionTime = (reactionTimes: ReactionTime[]) => {
-	return reactionTimes.map((reactionTime) => reactionTime.time!).reduce((sum, value) => sum + value, 0) / reactionTimes.length
+	return reactionTimes
+		.map((reactionTime) => reactionTime.time!)
+		.reduce((sum, value) => sum + value, 0) / reactionTimes.length
 }
 
 // Handle the user connecting
