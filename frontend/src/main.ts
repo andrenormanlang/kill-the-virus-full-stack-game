@@ -1,7 +1,7 @@
 import './assets/scss/style.scss'
 import './assets/ts/rounds'
 import { io, Socket } from 'socket.io-client'
-import { ClientToServerEvents, ServerToClientEvents, UserData, VirusData } from '@backend/types/shared/socket_types'
+import { ClientToServerEvents, PlayerData, ServerToClientEvents, UserData, VirusData } from '@backend/types/shared/socket_types'
 
 const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOST)
@@ -161,7 +161,19 @@ socket.on('reactionTime', (reactionTime) => {
 	(document.querySelector('#opponentTime') as HTMLDivElement).innerText = ` ${reactionTime}`
 })
 
-socket.on('firstRound', (firstRoundData, round) => {
+socket.on('firstRound', (firstRoundData, round, playerData1: PlayerData, playerData2: PlayerData) => {
+	const myId = socket.id
+	const yourNameEl = document.querySelector('.yourName') as HTMLDivElement
+	const opponentNameEl = document.querySelector('.opponentName') as HTMLDivElement
+	
+	if(myId === playerData1.id){
+		yourNameEl.innerHTML = `${playerData1.name} : `
+		opponentNameEl.innerHTML = `${playerData2.name} : `
+	}else{
+		yourNameEl.innerHTML = `${playerData2.name} : `
+		opponentNameEl.innerHTML = `${playerData1.name} : `
+	}
+
 	console.log('Round:', round)
 	// Hide lobby and show game
 	lobbyEl.style.display = 'none';
@@ -177,9 +189,10 @@ socket.on('newRound', (newRoundData) => {
 	displayVirus({ row, column, delay })
 })
 
-socket.on('updateScore', (player1Score: number, player2Score: number, player1Id: string, player2Id: string) => {
+socket.on('updateScore', (player1Score: number, player2Score: number, player1Id: string) => {
 	const myId = socket.id
 	const scoreEl = document.querySelector('#score') as HTMLDivElement;
+	
 
 	if (player1Id === myId) {
 		scoreEl.innerText = `${player1Score} - ${player2Score}`
