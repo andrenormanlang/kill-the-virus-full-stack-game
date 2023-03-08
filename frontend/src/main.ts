@@ -1,7 +1,7 @@
 import './assets/scss/style.scss'
 import './assets/ts/rounds'
 import { io, Socket } from 'socket.io-client'
-import { ClientToServerEvents, PlayerData, ServerToClientEvents, UserData, VirusData } from '@backend/types/shared/socket_types'
+import { ClientToServerEvents, PlayerData, ServerToClientEvents, VirusData } from '@backend/types/shared/socket_types'
 
 const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOST)

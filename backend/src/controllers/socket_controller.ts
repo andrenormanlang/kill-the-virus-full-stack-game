@@ -4,9 +4,9 @@
 import Debug from 'debug'
 import { Socket } from 'socket.io'
 import { createUser, deleteUser, findUser, updateScore, updateUsersVirusClicked } from '../services/user_service'
-import { ClientToServerEvents, LiveGameData, NewRoundData, ServerToClientEvents, UserData, PlayerData } from '../types/shared/socket_types'
+import { ClientToServerEvents, LiveGameData, NewRoundData, ServerToClientEvents, PlayerData } from '../types/shared/socket_types'
 import { io } from '../../server'
-import { createReactionTime, deleteReactionTimes, findReactionTimesByUserId, findReactionTimesByRoomId } from '../services/reactionTime_service'
+import { createReactionTime, deleteReactionTimes, findReactionTimesByUserId } from '../services/reactionTime_service'
 import { createGameRoom, deleteGameRoom, findGameRoomById, findGameRoomByUserCount, updateGameRoomsUserCount } from '../services/gameRoom_service'
 import { ReactionTime } from "@prisma/client"
 import prisma from '../prisma'
