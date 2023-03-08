@@ -4,7 +4,7 @@
 import Debug from 'debug'
 import { Socket } from 'socket.io'
 import { createUser, deleteUser, findUser, updateScore, updateUsersVirusClicked } from '../services/user_service'
-import { ClientToServerEvents, LiveGameData, NewRoundData, ServerToClientEvents, UserData } from '../types/shared/socket_types'
+import { ClientToServerEvents, LiveGameData, NewRoundData, ServerToClientEvents, UserData, PlayerData } from '../types/shared/socket_types'
 import { io } from '../../server'
 import { createReactionTime, deleteReactionTimes, findReactionTimesByUserId, findReactionTimesByRoomId } from '../services/reactionTime_service'
 import { createGameRoom, deleteGameRoom, findGameRoomById, findGameRoomByUserCount, updateGameRoomsUserCount } from '../services/gameRoom_service'
@@ -171,7 +171,23 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 					delay: virusData.delay,
 				}
 
-				io.to(existingRoom.id).emit('firstRound', firstRoundPayload, existingRoom.roundCount)
+				let userInformation = await prisma.user.findMany({
+					where: {
+						gameRoomId: user.gameRoomId
+					}
+				})
+
+				let playerData1: PlayerData = {
+					id: userInformation[0].id,
+					name: userInformation[0].name
+				}
+
+				let playerData2: PlayerData = {
+					id: userInformation[1].id,
+					name: userInformation[1].name
+				}
+
+				io.to(existingRoom.id).emit('firstRound', firstRoundPayload, existingRoom.roundCount, playerData1, playerData2)
 			}
 		}
 		catch (err) {

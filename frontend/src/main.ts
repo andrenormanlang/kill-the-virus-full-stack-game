@@ -1,7 +1,7 @@
 import './assets/scss/style.scss'
 import './assets/ts/rounds'
 import { io, Socket } from 'socket.io-client'
-import { ClientToServerEvents, ServerToClientEvents, UserData, VirusData } from '@backend/types/shared/socket_types'
+import { ClientToServerEvents, PlayerData, ServerToClientEvents, UserData, VirusData } from '@backend/types/shared/socket_types'
 
 const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOST)
@@ -117,7 +117,7 @@ socket.on('endGame', (userDataArray) => {
 	const [ userData1, userData2 ] = userDataArray
 	lobbyEl.style.display = 'none'
 	gameEl.style.display = 'none'
-	endGameBoardEl.style.display = 'block'
+	endGameBoardEl.style.display = 'flex'
 
 	winnerEl.innerHTML = userData1.averageReactionTime! < userData2.averageReactionTime! ? userData1.name : userData2.name
 
@@ -137,7 +137,19 @@ socket.on('reactionTime', (reactionTime) => {
 	console.log('Opponent:', reactionTime)
 })
 
-socket.on('firstRound', (firstRoundData, round) => {
+socket.on('firstRound', (firstRoundData, round, playerData1: PlayerData, playerData2: PlayerData) => {
+	const myId = socket.id
+	const yourNameEl = document.querySelector('.yourName') as HTMLDivElement
+	const opponentNameEl = document.querySelector('.opponentName') as HTMLDivElement
+	
+	if(myId === playerData1.id){
+		yourNameEl.innerHTML = `${playerData1.name} : `
+		opponentNameEl.innerHTML = `${playerData2.name} : `
+	}else{
+		yourNameEl.innerHTML = `${playerData2.name} : `
+		opponentNameEl.innerHTML = `${playerData1.name} : `
+	}
+
 	console.log('Round:', round)
 	// Hide lobby and show game
 	lobbyEl.style.display = 'none'
