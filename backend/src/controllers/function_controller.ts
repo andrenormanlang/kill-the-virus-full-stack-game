@@ -1,3 +1,6 @@
+/**
+ * Function Controller
+ */
 import Debug from 'debug'
 import prisma from '../prisma'
 import { io } from '../../server'
