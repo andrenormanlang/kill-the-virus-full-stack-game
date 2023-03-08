@@ -103,17 +103,21 @@ toLobbyEl.addEventListener('submit', (e) => {
 	e.preventDefault
 })
 
-const reactionList = document.getElementById('reactionList');
-
 socket.on('tenLatestGames', (latestGames) => {
 	// Handle the latestGames data here
 	console.log('Latest games:', latestGames)
+	const gamesAsListItems = latestGames
+		.map(game => {
+			return `<li>${game.player1} ${game.player1Score} - ${game.player2Score} ${game.player2}</li>`
+		})
+		.join('');
 
-	latestGames.forEach(game => {
-		const li = document.createElement('li')
-		li.textContent += `${game.player1} ${game.player1Score} : ${game.player2Score} ${game.player2}`
-		reactionList!.appendChild(li)
-	})
+	// latestGames.forEach(game => {
+	// 	const li = document.createElement('li')
+	// 	li.textContent = `${game.player1} ${game.player1Score} : ${game.player2Score} ${game.player2}`
+
+	// });
+	(document.getElementById('reactionList') as HTMLUListElement).innerHTML = `${gamesAsListItems}`
 });
 
 socket.on('liveScoreAndUsername', (player1Username, player1Score, player2Username, player2Score, gameRoomId) => {

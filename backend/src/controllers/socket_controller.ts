@@ -107,11 +107,9 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	debug('🙋🏼 A user connected -', socket.id)
 
 	const getLatestGames = async () => {
-		const latestGames = await prisma.tenLatestGames.findMany({
-			orderBy: { date: 'desc' }
-		})
+		const latestGames = await prisma.tenLatestGames.findMany({ orderBy: { date: 'desc' } })
 
-		socket.emit('tenLatestGames', latestGames)
+		io.emit('tenLatestGames', latestGames)
 	}
 
 	getLatestGames()
@@ -310,11 +308,10 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			const theGameRoom = await findGameRoomById(user.gameRoomId);
 			if (!theGameRoom) return;
 
-			const player1 = theGameRoom.users[0];
-			const player2 = theGameRoom.users[1];
+			const [ player1, player2 ] = theGameRoom.users
 
 			// Before removing the room and user add the game to the ten latest game in database
-			const tenLatestGame = await prisma.tenLatestGames.create({
+			await prisma.tenLatestGames.create({
 				data: {
 					player1: player1.name,
 					player2: player2.name,
@@ -329,20 +326,14 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			if (latestGameCount > 10) {
 
 				// Find oldest game
-				const getLatestGames = async () => {
-					const oldestGame = await prisma.tenLatestGames.findFirst({
-						orderBy: { date: 'asc' }
-					})
+				const oldestGame = await prisma.tenLatestGames.findFirst({ orderBy: { date: 'asc' } })
+				if (!oldestGame) return
 
-					// Delete oldest game
-					await prisma.tenLatestGames.delete({
-						where: {
-							id: oldestGame?.id
-						}
-					})
-				}
-				await getLatestGames()
+				// Delete oldest game
+				await prisma.tenLatestGames.delete({ where: { id: oldestGame.id } })
 			}
+
+			await getLatestGames()
 
 			const gameRoom = await findGameRoomById(user.gameRoomId)
 			if (!gameRoom) return
