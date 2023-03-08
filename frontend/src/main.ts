@@ -17,9 +17,13 @@ const gameEl = document.querySelector('#game') as HTMLDivElement
 const gameScreenEl = document.querySelector("#gameScreen") as HTMLDivElement
 const lobbyEl = document.querySelector('#lobby') as HTMLDivElement
 const endGameBoardEl = document.querySelector('#endGameBoard') as HTMLDivElement
-const winnerEl = document.querySelector('#winner') as HTMLDivElement
-const yourReactionTimeEl = document.querySelector('#yourReactionTime') as HTMLDivElement
-const opponentReactionTimeEl = document.querySelector('#opponentReactionTime') as HTMLDivElement
+
+// Others
+const winnerEl = document.querySelector('#winner') as HTMLHeadingElement
+const yourReactionTimeEl = document.querySelector('#yourReactionTime') as HTMLParagraphElement
+const opponentReactionTimeEl = document.querySelector('#opponentReactionTime') as HTMLParagraphElement
+const yourScoreEl = document.querySelector('#yourScore') as HTMLParagraphElement
+const opponentScoreEl = document.querySelector('#opponentScore') as HTMLParagraphElement
 
 // User details
 let username: string | null = null
@@ -122,11 +126,15 @@ socket.on('endGame', (userDataArray) => {
 	winnerEl.innerHTML = userData1.averageReactionTime! < userData2.averageReactionTime! ? userData1.name : userData2.name
 
 	if (userData1.id === socket.id) {
-		yourReactionTimeEl.innerHTML = `Your reaction time: ` + userData1.averageReactionTime!.toFixed(2)
-		opponentReactionTimeEl.innerHTML = `Opponent reaction time: ` + userData2.averageReactionTime!.toFixed(2)
+		yourReactionTimeEl.innerText = `Your reaction time: ${userData1.averageReactionTime!.toFixed(2)}`
+		yourScoreEl.innerText = `Your score: ${userData1.score}`
+		opponentReactionTimeEl.innerText = `Opponent reaction time: ${userData2.averageReactionTime!.toFixed(2)}`
+		opponentScoreEl.innerText = `Opponent score: ${userData2.score}`
 	} else {
-		yourReactionTimeEl.innerHTML = `Your reaction time: ` + userData2.averageReactionTime!.toFixed(2)
-		opponentReactionTimeEl.innerHTML = `Opponent reaction time: ` + userData1.averageReactionTime!.toFixed(2)
+		yourReactionTimeEl.innerText = `Your reaction time: ${userData2.averageReactionTime!.toFixed(2)}`
+		yourScoreEl.innerText = `Your score: ${userData2.score}`
+		opponentReactionTimeEl.innerText = `Opponent reaction time: ${userData1.averageReactionTime!.toFixed(2)}`
+		opponentScoreEl.innerText = `Opponent score: ${userData1.score}`
 	}
 
 	console.log('Game ended, goodbye.')

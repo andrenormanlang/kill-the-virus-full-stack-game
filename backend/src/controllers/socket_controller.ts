@@ -231,7 +231,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 				await updateUsersVirusClicked(user.id, { virusClicked: false })
 			})
 
-			updateScoresForGameRoom(gameRoom.id)
+			await updateScoresForGameRoom(gameRoom.id)
 
 			gameRoom = await prisma.gameRoom.update({
 				where: {
@@ -243,7 +243,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 			// When the game ends
 			if (gameRoom.roundCount > 10) {
-				// Returns an array of UserData objects
+				// Returns an array of UserData objects for every user
 				const userDataArray = await Promise.all(gameRoom.users.map(async (user) => {
 					const reactionTimes = await prisma.reactionTime.findMany({
 						where: { userId: user.id }
@@ -262,8 +262,38 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 				io.to(gameRoom.id).emit('endGame', userDataArray)
 
-				io.emit('removeLiveGame', user.gameRoomId)
-			} else {
+				const [ player1, player2 ] = gameRoom.users
+
+				// Before removing the room and user add the game to the ten latest game in database
+				await prisma.previousGame.create({
+					data: {
+						player1: player1.name,
+						player2: player2.name,
+						player1Score: player1.score || 0,
+						player2Score: player2.score || 0,
+					},
+				})
+
+				// Count how many games there are in tenLatestGames
+				const latestGamesCount = await prisma.previousGame.count()
+
+				if (latestGamesCount > 10) {
+					// Find oldest game
+					const oldestGame = await prisma.previousGame.findFirst({ orderBy: { date: 'asc' } })
+					if (!oldestGame) return
+
+					// Delete oldest game
+					await prisma.previousGame.delete({ where: { id: oldestGame.id } })
+				}
+
+				await getLatestGames()
+
+				const deletedRoom = await deleteGameRoom(user.gameRoomId)
+				debug('Room deleted:', deletedRoom)
+
+				io.emit('removeLiveGame', gameRoom.id)
+			}
+			else {
 				// Get the virus information
 				const virusData = calcVirusData()
 				const newRoundPayload: NewRoundData = {
@@ -279,59 +309,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 		catch (err) {
 			debug('ERROR clicking the virus!', err)
 		}
-
 	})
-
-	socket.on('toLobby', async () => {
-
-		debug('✌🏻 A user went to Lobby', socket.id)
-
-		try {
-			const user = await findUser(socket.id)
-			if (!user) return
-
-
-			const theGameRoom = await findGameRoomById(user.gameRoomId)
-			if (!theGameRoom) return
-
-			const [ player1, player2 ] = theGameRoom.users
-
-			// Before removing the room and user add the game to the ten latest game in database
-			await prisma.previousGame.create({
-				data: {
-					player1: player1.name,
-					player2: player2.name,
-					player1Score: player1.score || 0,
-					player2Score: player2.score || 0,
-				},
-			})
-
-			// Count how many games there are in tenLatestGames
-			const latestGamesCount = await prisma.previousGame.count()
-
-			if (latestGamesCount > 10) {
-
-				// Find oldest game
-				const oldestGame = await prisma.previousGame.findFirst({ orderBy: { date: 'asc' } })
-				if (!oldestGame) return
-
-				// Delete oldest game
-				await prisma.previousGame.delete({ where: { id: oldestGame.id } })
-			}
-
-			await getLatestGames()
-
-			const gameRoom = await findGameRoomById(user.gameRoomId)
-			if (!gameRoom) return
-			const deletedRoom = await deleteGameRoom(user.gameRoomId)
-			debug('Room deleted:', deletedRoom)
-
-		}
-		catch (err) {
-			debug('ERROR finding or deleting one of following: user, gameRoom', err)
-		}
-	})
-
 }
 
 
