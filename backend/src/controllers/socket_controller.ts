@@ -111,7 +111,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			orderBy: { date: 'desc' }
 		})
 
-		io.emit('tenLatestGames', latestGames)
+		socket.emit('tenLatestGames', latestGames)
 	}
 
 	getLatestGames()
