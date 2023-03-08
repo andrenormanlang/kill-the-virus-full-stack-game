@@ -94,19 +94,16 @@ socket.on('tenLatestGames', (latestGames) => {
 	(document.getElementById('reactionList') as HTMLUListElement).innerHTML = `${gamesAsListItems}`
 })
 
-socket.on('liveScoreAndUsername', (player1Username, player1Score, player2Username, player2Score, gameRoomId) => {
-
-	const gameList = document.getElementById("gameList") as HTMLUListElement
-
-	const gameListItem = `<li id="${gameRoomId}"> ${player1Username} ${player1Score} : ${player2Score} ${player2Username}</li>`
+socket.on('liveGame', (liveGameData) => {
+	const { player1Username, player1Score, player2Username, player2Score, gameRoomId } = liveGameData
+	const gameInfo = `${player1Username} ${player1Score} : ${player2Score} ${player2Username}`
 
 	const existingGameListItem = document.getElementById(gameRoomId)
-	if (existingGameListItem) {
-		existingGameListItem.innerHTML = `${player1Username} ${player1Score} : ${player2Score} ${player2Username}`
-	} else {
-
-		gameList.innerHTML += gameListItem
-	}
+	existingGameListItem
+		? existingGameListItem.innerHTML = `${gameInfo}`
+		: (document.getElementById("gameList") as HTMLUListElement).innerHTML += `
+			<li id="${gameRoomId}">${gameInfo}</li>
+		`
 })
 
 socket.on('removeLi', (gameRoomId) => {
@@ -155,11 +152,10 @@ socket.on('newRound', (newRoundData) => {
 	displayVirus({ row, column, delay })
 })
 
-socket.on('updateScore', (player1Score: number, player2Score: number, player1Id: string, player2Id: string) => {
-	const myId = socket.id
+socket.on('updateScore', (player1Score: number, player2Score: number, player1Id: string) => {
 	const scoreEl = document.querySelector('#score') as HTMLDivElement
 
-	if (player1Id === myId) {
+	if (player1Id === socket.id) {
 		scoreEl.innerText = `${player1Score} - ${player2Score}`
 	} else {
 		scoreEl.innerText = `${player2Score} - ${player1Score}`

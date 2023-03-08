@@ -4,7 +4,7 @@
 import Debug from 'debug'
 import { Socket } from 'socket.io'
 import { createUser, deleteUser, findUser, updateScore, updateUsersVirusClicked } from '../services/user_service'
-import { ClientToServerEvents, NewRoundData, ServerToClientEvents, UserData } from '../types/shared/socket_types'
+import { ClientToServerEvents, LiveGameData, NewRoundData, ServerToClientEvents, UserData } from '../types/shared/socket_types'
 import { io } from '../../server'
 import { createReactionTime, deleteReactionTimes, findReactionTimesByUserId, findReactionTimesByRoomId } from '../services/reactionTime_service'
 import { createGameRoom, deleteGameRoom, findGameRoomById, findGameRoomByUserCount, updateGameRoomsUserCount } from '../services/gameRoom_service'
@@ -44,7 +44,7 @@ const updateScoresForGameRoom = async (gameRoomId: string) => {
 				data: { score: { increment: 1 } }
 			})
 
-			const getPlayerScores = await prisma.user.findMany({
+			const players = await prisma.user.findMany({
 				where: { gameRoom: { id: gameRoomId } },
 				select: {
 					id: true,
@@ -53,20 +53,27 @@ const updateScoresForGameRoom = async (gameRoomId: string) => {
 				}
 			})
 
-			const player1Score = getPlayerScores[0]?.score ?? 0
-			const player2Score = getPlayerScores[1]?.score ?? 0
+			const player1Score = players[0].score ?? 0
+			const player2Score = players[1].score ?? 0
 
-			const player1Id = getPlayerScores[0]?.id
-			const player2Id = getPlayerScores[1]?.id
+			const player1Username = players[0].name
+			const player2Username = players[1].name
 
-			const player1Username = getPlayerScores[0]?.name
-			const player2Username = getPlayerScores[1]?.name
+			const player1Id = players[0].id
 
-			debug('players score:', getPlayerScores)
+			debug('players score:', players)
 
-			io.to(gameRoomId).emit('updateScore', player1Score, player2Score, player1Id, player2Id)
+			io.to(gameRoomId).emit('updateScore', player1Score, player2Score, player1Id)
 
-			io.emit('liveScoreAndUsername', player1Username, player1Score, player2Username, player2Score, gameRoomId)
+			const liveGamePayload: LiveGameData = {
+				player1Username,
+				player1Score,
+				player2Username,
+				player2Score,
+				gameRoomId,
+			}
+
+			io.emit('liveGame', liveGamePayload)
 
 		}
 	} catch (err) {

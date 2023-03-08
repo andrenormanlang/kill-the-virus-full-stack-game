@@ -14,8 +14,8 @@ export interface ServerToClientEvents {
 	roomAvailable: (room: GameRoom) => void
 	endGame: (userData1: UserData, userData2: UserData) => void
 	reactionTime: (reactionTime: number) => void
-	updateScore: (player1Score: number, player2Score: number, player1Id: string, player2Id: string) => void
-	liveScoreAndUsername: (player1Username: string, player1Score: number, player2Username: string, player2Score: number, gameRoomId: string) => void
+	updateScore: (player1Score: number, player2Score: number, player1Id: string) => void
+	liveGame: (liveGameData: LiveGameData) => void
 	removeLi: (gameRoomId: string) => void
 	tenLatestGames: (latestGame: {
 		player1: string;
@@ -63,4 +63,12 @@ export interface NewRoundData {
 	column: number
 	delay: number
 	round: number
+}
+
+export interface LiveGameData {
+	player1Username: string
+	player1Score: number
+	player2Username: string
+	player2Score: number
+	gameRoomId: string
 }
