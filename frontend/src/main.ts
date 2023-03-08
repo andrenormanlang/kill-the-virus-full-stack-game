@@ -61,26 +61,14 @@ const displayVirus = (virusData: VirusData) => {
 }
 
 toLobbyEl.addEventListener('click', () => {
-
-	socket.emit('toLobby')
-
 	lobbyEl.style.display = 'block'
 	gameEl.style.display = 'none'
 	endGameBoardEl.style.display = 'none'
 	location.reload()
-
 })
 
 socket.on('connect', () => {
 	console.log('Connected to server')
-})
-
-socket.on('hello', () => {
-	console.log('Server saying hello')
-})
-
-socket.on('userJoinedGame', (username) => {
-	console.log(username, 'has joined the game')
 })
 
 toLobbyEl.addEventListener('submit', (e) => {
@@ -92,7 +80,7 @@ socket.on('tenLatestGames', (latestGames) => {
 	console.log('Latest games:', latestGames)
 
 	const gamesAsListItems = latestGames
-		.map(game => `<li>${game.player1} ${game.player1Score} - ${game.player2Score	} ${game.player2}</li>`)
+		.map(game => `<li>${game.player1} ${game.player1Score} - ${game.player2Score} ${game.player2}</li>`)
 		.join('');
 
 	(document.getElementById('reactionList') as HTMLUListElement).innerHTML = `${gamesAsListItems}`
