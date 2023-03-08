@@ -111,7 +111,7 @@ socket.on('tenLatestGames', (latestGames) => {
 
 	latestGames.forEach(game => {
 		const li = document.createElement('li')
-		li.textContent += `${game.player1} ${game.player1Score} : ${game.player2} ${game.player2Score}`
+		li.textContent += `${game.player1} ${game.player1Score} : ${game.player2Score} ${game.player2}`
 		reactionList!.appendChild(li)
 	})
 });

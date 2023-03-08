@@ -322,6 +322,7 @@ main {
 	width: 200px;
 	transition: 0.5s;
 	text-align: center;
+	list-style: none;
 }
 
 #reactionList li {
@@ -333,4 +334,16 @@ main {
 	width: 200px;
 	transition: 0.5s;
 	text-align: center;
+	list-style: none;
 }
+
+#gameList,
+#reactionList {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+}
+
