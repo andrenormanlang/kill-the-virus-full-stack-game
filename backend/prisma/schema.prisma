@@ -31,7 +31,7 @@ model ReactionTime {
     userId String?
 }
 
-model TenLatestGames {
+model PreviousGame {
     id           String   @id @default(auto()) @map("_id") @db.ObjectId
     player1      String
     player2      String

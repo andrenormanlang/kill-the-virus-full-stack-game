@@ -76,8 +76,8 @@ const updateScoresForGameRoom = async (gameRoomId: string) => {
 				}
 			})
 
-			const player1Score = getPlayerScores[0]?.score ?? 0;
-			const player2Score = getPlayerScores[1]?.score ?? 0;
+			const player1Score = getPlayerScores[0]?.score ?? 0
+			const player2Score = getPlayerScores[1]?.score ?? 0
 
 			const player1Id = getPlayerScores[0]?.id
 			const player2Id = getPlayerScores[1]?.id
@@ -89,7 +89,7 @@ const updateScoresForGameRoom = async (gameRoomId: string) => {
 
 			io.to(gameRoomId).emit('updateScore', player1Score, player2Score, player1Id, player2Id)
 
-			io.emit('liveScoreAndUsername', player1Username, player1Score, player2Username, player2Score, gameRoomId);
+			io.emit('liveScoreAndUsername', player1Username, player1Score, player2Username, player2Score, gameRoomId)
 
 		}
 	} catch (err) {
@@ -107,7 +107,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	debug('🙋🏼 A user connected -', socket.id)
 
 	const getLatestGames = async () => {
-		const latestGames = await prisma.tenLatestGames.findMany({ orderBy: { date: 'desc' } })
+		const latestGames = await prisma.previousGame.findMany({ orderBy: { date: 'desc' } })
 
 		io.emit('tenLatestGames', latestGames)
 	}
@@ -305,13 +305,13 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			if (!user) return
 
 
-			const theGameRoom = await findGameRoomById(user.gameRoomId);
-			if (!theGameRoom) return;
+			const theGameRoom = await findGameRoomById(user.gameRoomId)
+			if (!theGameRoom) return
 
 			const [ player1, player2 ] = theGameRoom.users
 
 			// Before removing the room and user add the game to the ten latest game in database
-			await prisma.tenLatestGames.create({
+			await prisma.previousGame.create({
 				data: {
 					player1: player1.name,
 					player2: player2.name,
@@ -321,16 +321,16 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			})
 
 			// Count how many games there are in tenLatestGames
-			const latestGameCount = await prisma.tenLatestGames.count()
+			const latestGamesCount = await prisma.previousGame.count()
 
-			if (latestGameCount > 10) {
+			if (latestGamesCount > 10) {
 
 				// Find oldest game
-				const oldestGame = await prisma.tenLatestGames.findFirst({ orderBy: { date: 'asc' } })
+				const oldestGame = await prisma.previousGame.findFirst({ orderBy: { date: 'asc' } })
 				if (!oldestGame) return
 
 				// Delete oldest game
-				await prisma.tenLatestGames.delete({ where: { id: oldestGame.id } })
+				await prisma.previousGame.delete({ where: { id: oldestGame.id } })
 			}
 
 			await getLatestGames()
