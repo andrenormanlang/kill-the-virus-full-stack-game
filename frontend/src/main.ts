@@ -106,7 +106,7 @@ socket.on('liveGame', (liveGameData) => {
 		`
 })
 
-socket.on('removeLi', (gameRoomId) => {
+socket.on('removeLiveGame', (gameRoomId) => {
 	const listItemToRemove = document.getElementById(gameRoomId)
 	if (listItemToRemove) {
 		listItemToRemove.remove()

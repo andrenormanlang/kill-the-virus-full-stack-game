@@ -16,7 +16,7 @@ export interface ServerToClientEvents {
 	reactionTime: (reactionTime: number) => void
 	updateScore: (player1Score: number, player2Score: number, player1Id: string) => void
 	liveGame: (liveGameData: LiveGameData) => void
-	removeLi: (gameRoomId: string) => void
+	removeLiveGame: (gameRoomId: string) => void
 	tenLatestGames: (latestGame: {
 		player1: string;
 		player2: string;

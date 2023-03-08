@@ -109,7 +109,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			const user = await findUser(socket.id)
 			if (!user) return
 
-			io.emit('removeLi', user.gameRoomId)
+			io.emit('removeLiveGame', user.gameRoomId)
 
 			const reactionTimes = await findReactionTimesByUserId(user.id)
 			if (!reactionTimes) return
@@ -262,7 +262,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 				io.to(gameRoom.id).emit('endGame', userData1, userData2)
 
-				io.emit('removeLi', user.gameRoomId)
+				io.emit('removeLiveGame', user.gameRoomId)
 			} else {
 				// Get the virus information
 				const virusData = calcVirusData()
