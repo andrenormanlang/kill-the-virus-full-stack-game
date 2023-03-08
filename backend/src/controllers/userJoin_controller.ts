@@ -26,7 +26,7 @@ export const listenForUserJoin = (socket: Socket<ClientToServerEvents, ServerToC
 				const gameRoom = await createGameRoom({ userCount: 1, roundCount: 1 })
 
 				// Create a user and connect with newly created gameRoom
-				const user = await createUser({
+				await createUser({
 					id: socket.id,
 					name: username,
 					gameRoomId: gameRoom.id,
@@ -34,47 +34,45 @@ export const listenForUserJoin = (socket: Socket<ClientToServerEvents, ServerToC
 				})
 
 				socket.join(gameRoom.id)
-				debug(user.name, 'created and joined a game:', gameRoom.id)
+				return
 			}
 
-			else if (existingRoom.userCount === 1) {
-				const user = await createUser({
-					id: socket.id,
-					name: username,
-					gameRoomId: existingRoom.id,
-					score: 0
-				})
+			const user = await createUser({
+				id: socket.id,
+				name: username,
+				gameRoomId: existingRoom.id,
+				score: 0
+			})
 
-				await updateGameRoomsUserCount(existingRoom.id, { userCount: 2 })
+			await updateGameRoomsUserCount(existingRoom.id, { userCount: 2 })
 
-				socket.join(existingRoom.id)
-				debug(user.name, 'joined a game:', existingRoom.id)
+			socket.join(existingRoom.id)
+			debug(user.name, 'joined a game:', existingRoom.id)
 
-				const virusData = calcVirusData()
-				const firstRoundPayload = {
-					row: virusData.row,
-					column: virusData.column,
-					delay: virusData.delay,
-				}
-
-				let userInformation = await prisma.user.findMany({
-					where: {
-						gameRoomId: user.gameRoomId
-					}
-				})
-
-				let playerData1: PlayerData = {
-					id: userInformation[0].id,
-					name: userInformation[0].name
-				}
-
-				let playerData2: PlayerData = {
-					id: userInformation[1].id,
-					name: userInformation[1].name
-				}
-
-				io.to(existingRoom.id).emit('firstRound', firstRoundPayload, existingRoom.roundCount, playerData1, playerData2)
+			const virusData = calcVirusData()
+			const firstRoundPayload = {
+				row: virusData.row,
+				column: virusData.column,
+				delay: virusData.delay,
 			}
+
+			let userInformation = await prisma.user.findMany({
+				where: {
+					gameRoomId: user.gameRoomId
+				}
+			})
+
+			let playerData1: PlayerData = {
+				id: userInformation[0].id,
+				name: userInformation[0].name
+			}
+
+			let playerData2: PlayerData = {
+				id: userInformation[1].id,
+				name: userInformation[1].name
+			}
+
+			io.to(existingRoom.id).emit('firstRound', firstRoundPayload, existingRoom.roundCount, playerData1, playerData2)
 		}
 		catch (err) {
 			debug('ERROR creating or joining a game!')

@@ -61,8 +61,21 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 				data: { roundCount: { increment: 1 } }
 			})
 	
+			// For every round
+			if (gameRoom.roundCount <= 10) {
+				// Get the virus information
+				const virusData = calcVirusData()
+				const newRoundPayload: NewRoundData = {
+					row: virusData.row,
+					column: virusData.column,
+					delay: virusData.delay,
+					round: gameRoom.roundCount,
+				}
+				// Give the next virus to both players
+				io.to(gameRoom.id).emit('newRound', newRoundPayload)
+			}
 			// When the game ends
-			if (gameRoom.roundCount > 10) {
+			else {
 				// Returns an array of UserData objects for every user
 				const userDataArray = await Promise.all(gameRoom.users.map(async (user) => {
 					const reactionTimes = await prisma.reactionTime.findMany({
@@ -112,18 +125,6 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 				debug('Room deleted:', deletedRoom)
 	
 				io.emit('removeLiveGame', gameRoom.id)
-			}
-			else {
-				// Get the virus information
-				const virusData = calcVirusData()
-				const newRoundPayload: NewRoundData = {
-					row: virusData.row,
-					column: virusData.column,
-					delay: virusData.delay,
-					round: gameRoom.roundCount,
-				}
-				// Give the next virus to both players
-				io.to(gameRoom.id).emit('newRound', newRoundPayload)
 			}
 		}
 		catch (err) {
