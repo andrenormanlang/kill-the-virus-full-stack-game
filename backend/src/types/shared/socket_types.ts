@@ -12,7 +12,7 @@ export interface ServerToClientEvents {
 	newRound: (newRoundData: NewRoundData) => void
 	userJoinedGame: (username: string) => void
 	roomAvailable: (room: GameRoom) => void
-	endGame: (userData1: UserData, userData2: UserData) => void
+	endGame: (userDataArray: UserData[]) => void
 	reactionTime: (reactionTime: number) => void
 	updateScore: (player1Score: number, player2Score: number, player1Id: string) => void
 	liveGame: (liveGameData: LiveGameData) => void

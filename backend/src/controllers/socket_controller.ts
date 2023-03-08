@@ -227,40 +227,24 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 			// When the game ends
 			if (gameRoom.roundCount > 10) {
-				// const allReactionTimes = await findReactionTimesByRoomId(gameRoom.id)
-				// debug('allReactionTimes:', allReactionTimes)
-				const player1ReactionTimes = await prisma.reactionTime.findMany({
-					where: {
-						userId: gameRoom.users[0].id
+				// Returns an array of UserData objects
+				const userDataArray = await Promise.all(gameRoom.users.map(async (user) => {
+					const reactionTimes = await prisma.reactionTime.findMany({
+						where: { userId: user.id }
+					})
+
+					const playerAverageReactionTime = averageReactionTime(reactionTimes)
+
+					return {
+						id: user.id,
+						name: user.name,
+						gameRoomId: gameRoom!.id,
+						score: user.score!,
+						averageReactionTime: playerAverageReactionTime
 					}
-				})
+				}))
 
-				const player2ReactionTimes = await prisma.reactionTime.findMany({
-					where: {
-						userId: gameRoom.users[1].id
-					}
-				})
-
-				const player1AverageReactionTime = averageReactionTime(player1ReactionTimes)
-				const player2AverageReactionTime = averageReactionTime(player2ReactionTimes)
-
-				const userData1: UserData = {
-					id: gameRoom.users[0].id,
-					name: gameRoom.users[0].name,
-					gameRoomId: gameRoom.id,
-					score: gameRoom.users[0].score!,
-					averageReactionTime: player1AverageReactionTime
-				}
-
-				const userData2: UserData = {
-					id: gameRoom.users[1].id,
-					name: gameRoom.users[1].name,
-					gameRoomId: gameRoom.id,
-					score: gameRoom.users[1].score!,
-					averageReactionTime: player2AverageReactionTime
-				}
-
-				io.to(gameRoom.id).emit('endGame', userData1, userData2)
+				io.to(gameRoom.id).emit('endGame', userDataArray)
 
 				io.emit('removeLiveGame', user.gameRoomId)
 			} else {

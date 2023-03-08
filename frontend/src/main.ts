@@ -113,7 +113,8 @@ socket.on('removeLiveGame', (gameRoomId) => {
 	}
 })
 
-socket.on('endGame', (userData1: UserData, userData2: UserData) => {
+socket.on('endGame', (userDataArray) => {
+	const [ userData1, userData2 ] = userDataArray
 	lobbyEl.style.display = 'none'
 	gameEl.style.display = 'none'
 	endGameBoardEl.style.display = 'block'
