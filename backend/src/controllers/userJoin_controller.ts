@@ -10,18 +10,20 @@ import { createGameRoom, findGameRoomByUserCount, updateGameRoomsUserCount } fro
 import { createUser } from "../services/user_service"
 import { ClientToServerEvents, PlayerData, ServerToClientEvents } from "../types/shared/socket_types"
 import { calcVirusData } from "./function_controller"
+import { GameRoom } from "@prisma/client"
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
 
+let availableGameRooms: GameRoom[] = []
 
 export const listenForUserJoin = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
 	socket.on('userJoin', async (username) => {
 		try {
-			// Find an existing gameRoom with only 1 user
-			const existingRoom = await findGameRoomByUserCount(1)
+			// // Find an existing gameRoom with only 1 user
+			// const existingRoom = await findGameRoomByUserCount(1)
 
-			if (!existingRoom || existingRoom.userCount !== 1) {
+			if (availableGameRooms.length === 0) {
 				// Create a new gameRoom
 				const gameRoom = await createGameRoom({ userCount: 1, roundCount: 1 })
 
@@ -34,9 +36,14 @@ export const listenForUserJoin = (socket: Socket<ClientToServerEvents, ServerToC
 				})
 
 				socket.join(gameRoom.id)
+
+				availableGameRooms.push(gameRoom)
 				return
 			}
 
+			const existingRoom = availableGameRooms.pop()!
+
+			// Continue if there is no existing lobby
 			const user = await createUser({
 				id: socket.id,
 				name: username,

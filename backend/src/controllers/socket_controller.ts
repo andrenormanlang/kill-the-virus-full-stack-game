@@ -11,6 +11,7 @@ import { deleteGameRoom, findGameRoomById } from '../services/gameRoom_service'
 import { getLatestGames } from './function_controller'
 import { listenForVirusClick } from './clickVirus_controller'
 import { listenForUserJoin } from './userJoin_controller'
+import prisma from '../prisma'
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
@@ -18,6 +19,17 @@ const debug = Debug('ktv:socket_controller')
 // Handle the user connecting
 export const handleConnection = async (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
 	debug('🙋🏼 A user connected -', socket.id)
+
+	// When entering the site, join the lobby
+	try {
+		const lobby	= await prisma.lobby.findFirst()
+		if (!lobby) return
+
+		socket.join(lobby.id)
+	}
+	catch (err) {
+		debug('Could not find lobby to join')
+	}
 
 	await getLatestGames()
 
