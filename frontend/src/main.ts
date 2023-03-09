@@ -82,6 +82,20 @@ socket.on('tenLatestGames', (latestGames) => {
 	(document.getElementById('reactionList') as HTMLUListElement).innerHTML = `${gamesAsListItems}`
 })
 
+// Handle best ever raction time here 
+socket.on('bestEverReactionTime', (username, time) => {
+	const highScoreElement = document.querySelector('#highScore')
+
+	if (!highScoreElement) return
+
+	if (username && time) {
+		highScoreElement.textContent = `${username}: ${time} seconds`
+	} else {
+		highScoreElement.textContent = 'No high score yet'
+	}
+
+})
+
 socket.on('liveGame', (liveGameData) => {
 	const { player1Username, player1Score, player2Username, player2Score, gameRoomId } = liveGameData
 	const gameInfo = `${player1Username} ${player1Score} : ${player2Score} ${player2Username}`
@@ -102,7 +116,7 @@ socket.on('removeLiveGame', (gameRoomId) => {
 })
 
 socket.on('endGame', (userDataArray) => {
-	const [ userData1, userData2 ] = userDataArray
+	const [userData1, userData2] = userDataArray
 	lobbyEl.style.display = 'none'
 	gameEl.style.display = 'none'
 	endGameBoardEl.style.display = 'flex'

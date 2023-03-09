@@ -32,6 +32,20 @@ export const getLatestGames = async () => {
 	io.emit('tenLatestGames', latestGames)
 }
 
+export const getBestEverReactionTime = async () => {
+	const bestEverReactionTime = await prisma.reactionTime.findFirst({
+		where: { time: { not: null } },
+		orderBy: { time: 'asc' },
+		include: { user: true },
+	})
+	debug(bestEverReactionTime)
+
+	const userName = bestEverReactionTime?.user?.name ?? null;
+	const time = bestEverReactionTime?.time ?? null;
+
+	io.emit('bestEverReactionTime', userName, time)
+}
+
 export const updateScores = async (gameRoomId: string) => {
 	try {
 		const latestReactionTimes = await prisma.reactionTime.findMany({
@@ -43,7 +57,7 @@ export const updateScores = async (gameRoomId: string) => {
 		debug('latestReactionTimes:', latestReactionTimes)
 
 		if (!(latestReactionTimes[0].time && latestReactionTimes[1].time)) return
-		
+
 		// Should be always the winner because sort by time
 		const winner = latestReactionTimes.sort((reactionTime1, reactionTime2) => reactionTime1.time! - reactionTime2.time!)[0].user!
 		debug('winner:', winner)
