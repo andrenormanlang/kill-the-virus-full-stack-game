@@ -48,7 +48,6 @@ export const getBestEverReactionTime = async () => {
 
 export const getBestAverageReactionTime = async () => {
 	const bestAverageReactionTime = await prisma.averageReactionTime.findFirst({
-		where: { averageReactionTime: { not: null } },
 		orderBy: { averageReactionTime: 'asc' },
 	})
 

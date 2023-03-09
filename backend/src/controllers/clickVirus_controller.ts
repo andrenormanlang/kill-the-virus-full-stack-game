@@ -54,9 +54,7 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 			await updateScores(gameRoom.id)
 
 			gameRoom = await prisma.gameRoom.update({
-				where: {
-					id: gameRoom.id
-				},
+				where: { id: gameRoom.id },
 				include: { users: true },
 				data: { roundCount: { increment: 1 } }
 			})
@@ -82,7 +80,7 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 						where: { userId: user.id }
 					})
 
-					const playerAverageReactionTime = averageReactionTime(reactionTimes)
+					const playerAverageReactionTime = Number(averageReactionTime(reactionTimes).toFixed(3))
 
 					// Save the average reaction time for each player in the database
 					await prisma.averageReactionTime.create({
