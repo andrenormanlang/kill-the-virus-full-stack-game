@@ -12,7 +12,7 @@ export interface ServerToClientEvents {
 	reactionTime: (reactionTime: number) => void
 	updateScore: (player1Score: number, player2Score: number, player1Id: string) => void
 	liveGame: (liveGameData: LiveGameData) => void
-	liveGames: (liveGames: LiveGameData[]) => void
+	liveGames: (liveGames: LiveGameData[] | []) => void
 	removeLiveGame: (gameRoomId: string) => void
 	tenLatestGames: (latestGames: LatestGamesData[]) => void
 	bestEverReactionTime: (userName: string | null, time: number | null) => void

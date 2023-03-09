@@ -12,7 +12,6 @@ import { listenForVirusClick } from './clickVirus_controller'
 import { availableGameRooms, listenForUserJoin } from './userJoin_controller'
 import { getPreviousGames } from '../services/previousGame_service'
 import { getBestAverageReactionTime } from '../services/averageReactionTime_service'
-import prisma from '../prisma'
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
@@ -90,9 +89,6 @@ export const handleConnection = async (socket: Socket<ClientToServerEvents, Serv
 
 			io.emit('removeLiveGame', user.gameRoomId)
 
-			const deletedUser = await deleteUser(user.id)
-			debug('User deleted:', deletedUser.name)
-
 			const gameRoom = await findGameRoomById(user.gameRoomId)
 			if (!gameRoom) return
 
@@ -100,7 +96,8 @@ export const handleConnection = async (socket: Socket<ClientToServerEvents, Serv
 
 			availableGameRooms.pop()
 
-			const deletedRoom = await deleteGameRoom(user.gameRoomId)
+			// Delete gameRoom
+			const deletedRoom = await deleteGameRoom(gameRoom.id)
 			debug('Room deleted:', deletedRoom)
 		}
 		catch (err) {

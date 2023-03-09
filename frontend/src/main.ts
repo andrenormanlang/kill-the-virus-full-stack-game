@@ -110,11 +110,11 @@ socket.on('liveGame', (liveGameData) => {
 })
 
 socket.on('liveGames', (liveGames) => {
-	liveGames.forEach((game) => {
-		(document.getElementById("gameList") as HTMLUListElement).innerHTML += `
-			<li id="${game.gameRoomId}">${game.player1Username} ${game.player1Score} <span class = "emoji"> ⚔️ </span> ${game.player2Username} ${game.player2Score}</li>
-		`
-	})
+	const liveGamesHTML = liveGames
+		.map(game => `<li id="${game.gameRoomId}">${game.player1Username} ${game.player1Score} <span class = "emoji"> ⚔️ </span> ${game.player2Username} ${game.player2Score}</li>`)
+		.join('');
+		
+	(document.getElementById("gameList") as HTMLUListElement).innerHTML = `${liveGamesHTML}`
 })
 
 socket.on('removeLiveGame', (gameRoomId) => {
