@@ -20,11 +20,41 @@ const debug = Debug('ktv:socket_controller')
 export const handleConnection = async (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
 	debug('🙋🏼 A user connected -', socket.id)
 
-	const latestGames = await getLatestGames()
-	socket.emit('tenLatestGames', latestGames)
+	// Get and emit the latetsGames
+	try {
+		const latestGames = await getLatestGames()
+		socket.emit('tenLatestGames', latestGames)
 
-	await getBestEverReactionTime()
-	await getBestAverageReactionTime()
+	}
+	catch (err) {
+		debug('Could not get the 10 latest games')
+	}
+
+	// Get and emit the bestEverReactionTime
+	try {
+		const bestEverReactionTime = await getBestEverReactionTime()
+
+		const userName = bestEverReactionTime?.user?.name ?? null
+		const time = bestEverReactionTime?.time ?? null
+
+		socket.emit('bestEverReactionTime', userName, time)
+	}
+	catch (err) {
+		debug('Could not get the bestEverReactionTime')
+	}
+
+	// Get and emit the bestAverageReactionTime
+	try {
+		const bestAverageReactionTime = await getBestAverageReactionTime()
+		
+		const userName = bestAverageReactionTime?.name ?? null
+		const averageReactionTime = bestAverageReactionTime?.averageReactionTime ?? 0
+
+		socket.emit('bestAverageReactionTime', userName, averageReactionTime)
+	}
+	catch (err) {
+		debug('Could not get the bestAverageReactionTime')
+	}
 
 	// Handle user disconnecting
 	socket.on('disconnect', async () => {
@@ -36,16 +66,13 @@ export const handleConnection = async (socket: Socket<ClientToServerEvents, Serv
 
 			io.emit('removeLiveGame', user.gameRoomId)
 
-			const reactionTimes = await findReactionTimesByUserId(user.id)
-			if (!reactionTimes) return
-			const deletedReactionTimes = await deleteReactionTimes(user.id)
-			debug('Reaction times deleted:', deletedReactionTimes)
-
 			const deletedUser = await deleteUser(user.id)
 			debug('User deleted:', deletedUser.name)
 
 			const gameRoom = await findGameRoomById(user.gameRoomId)
 			if (!gameRoom) return
+
+			socket.broadcast.to(gameRoom.id).emit('opponentLeft')
 
 			availableGameRooms.pop()
 
