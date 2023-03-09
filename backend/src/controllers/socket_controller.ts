@@ -11,6 +11,7 @@ import { deleteGameRoom, findGameRoomById } from '../services/gameRoom_service'
 import { getBestAverageReactionTime, getBestEverReactionTime, getLatestGames } from './function_controller'
 import { listenForVirusClick } from './clickVirus_controller'
 import { listenForUserJoin } from './userJoin_controller'
+import prisma from '../prisma'
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
@@ -54,8 +55,10 @@ export const handleConnection = async (socket: Socket<ClientToServerEvents, Serv
 		}
 	})
 
+	// socket.on('userJoin')
 	listenForUserJoin(socket)
 
+	// socket.on('virusClick')
 	listenForVirusClick(socket)
 }
 

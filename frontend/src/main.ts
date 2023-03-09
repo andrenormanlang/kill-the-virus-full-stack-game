@@ -71,10 +71,6 @@ socket.on('connect', () => {
 	console.log('Connected to server')
 })
 
-toLobbyEl.addEventListener('submit', (e) => {
-	e.preventDefault
-})
-
 // Handle the latestGames data here
 socket.on('tenLatestGames', (latestGames) => {
 	console.log('Latest games:', latestGames)
@@ -141,14 +137,14 @@ socket.on('endGame', (userDataArray) => {
 	winnerEl.innerHTML = userData1.averageReactionTime! < userData2.averageReactionTime! ? userData1.name : userData2.name
 
 	if (userData1.id === socket.id) {
-		yourReactionTimeEl.innerText = `Your reaction time: ${userData1.averageReactionTime!.toFixed(2)}`
+		yourReactionTimeEl.innerText = `Your average reaction time: ${userData1.averageReactionTime!.toFixed(2)}`
 		yourScoreEl.innerText = `Your score: ${userData1.score}`
-		opponentReactionTimeEl.innerText = `Opponent reaction time: ${userData2.averageReactionTime!.toFixed(2)}`
+		opponentReactionTimeEl.innerText = `Opponents average reaction time: ${userData2.averageReactionTime!.toFixed(2)}`
 		opponentScoreEl.innerText = `Opponent score: ${userData2.score}`
 	} else {
-		yourReactionTimeEl.innerText = `Your reaction time: ${userData2.averageReactionTime!.toFixed(2)}`
+		yourReactionTimeEl.innerText = `Your average reaction time: ${userData2.averageReactionTime!.toFixed(2)}`
 		yourScoreEl.innerText = `Your score: ${userData2.score}`
-		opponentReactionTimeEl.innerText = `Opponent reaction time: ${userData1.averageReactionTime!.toFixed(2)}`
+		opponentReactionTimeEl.innerText = `Opponents average reaction time: ${userData1.averageReactionTime!.toFixed(2)}`
 		opponentScoreEl.innerText = `Opponent score: ${userData1.score}`
 	}
 
@@ -161,16 +157,16 @@ socket.on('reactionTime', (reactionTime) => {
 })
 
 socket.on('firstRound', (firstRoundData, round, playerData1: PlayerData, playerData2: PlayerData) => {
-	const myId = socket.id
 	const yourNameEl = document.querySelector('.yourName') as HTMLDivElement
 	const opponentNameEl = document.querySelector('.opponentName') as HTMLDivElement
-
-	if (myId === playerData1.id) {
-		yourNameEl.innerHTML = `${playerData1.name} : `
-		opponentNameEl.innerHTML = `${playerData2.name} : `
-	} else {
-		yourNameEl.innerHTML = `${playerData2.name} : `
-		opponentNameEl.innerHTML = `${playerData1.name} : `
+	
+	if(socket.id === playerData1.id){
+		yourNameEl.innerText = `${playerData1.name} : `
+		opponentNameEl.innerText = `${playerData2.name} : `
+	}
+	else{
+		yourNameEl.innerText = `${playerData2.name} : `
+		opponentNameEl.innerText = `${playerData1.name} : `
 	}
 
 	console.log('Round:', round)
@@ -208,7 +204,6 @@ usernameFormEl.addEventListener('submit', e => {
 	username = (usernameFormEl.querySelector('#username-input') as HTMLInputElement).value.trim()
 	if (!username) return
 
-	// socket.emit('userJoinedLobby', username)
 	socket.emit('userJoin', username)
 })
 

@@ -8,20 +8,19 @@ import { io } from "../../server"
 import { Socket } from "socket.io"
 import { createGameRoom, findGameRoomByUserCount, updateGameRoomsUserCount } from "../services/gameRoom_service"
 import { createUser } from "../services/user_service"
-import { ClientToServerEvents, PlayerData, ServerToClientEvents } from "../types/shared/socket_types"
-import { calcVirusData } from "./function_controller"
+import { ClientToServerEvents, LiveGameData, PlayerData, ServerToClientEvents } from "../types/shared/socket_types"
+import { calcVirusData, updateScores } from "./function_controller"
+import { GameRoom } from "@prisma/client"
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
 
+let availableGameRooms: GameRoom[] = []
 
 export const listenForUserJoin = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
 	socket.on('userJoin', async (username) => {
 		try {
-			// Find an existing gameRoom with only 1 user
-			const existingRoom = await findGameRoomByUserCount(1)
-
-			if (!existingRoom || existingRoom.userCount !== 1) {
+			if (availableGameRooms.length === 0) {
 				// Create a new gameRoom
 				const gameRoom = await createGameRoom({ userCount: 1, roundCount: 1 })
 
@@ -34,8 +33,13 @@ export const listenForUserJoin = (socket: Socket<ClientToServerEvents, ServerToC
 				})
 
 				socket.join(gameRoom.id)
+
+				availableGameRooms.push(gameRoom)
 				return
 			}
+
+			// Join the existing gameRoom
+			const existingRoom = availableGameRooms.pop()!
 
 			const user = await createUser({
 				id: socket.id,
@@ -56,23 +60,28 @@ export const listenForUserJoin = (socket: Socket<ClientToServerEvents, ServerToC
 				delay: virusData.delay,
 			}
 
-			let userInformation = await prisma.user.findMany({
-				where: {
-					gameRoomId: user.gameRoomId
-				}
-			})
+			const userInformation = await prisma.user.findMany({ where: { gameRoomId: existingRoom.id } })
 
-			let playerData1: PlayerData = {
+			const playerData1: PlayerData = {
 				id: userInformation[0].id,
 				name: userInformation[0].name
 			}
 
-			let playerData2: PlayerData = {
+			const playerData2: PlayerData = {
 				id: userInformation[1].id,
 				name: userInformation[1].name
 			}
 
+			const liveGamePayload: LiveGameData = {
+				player1Username: userInformation[0].name,
+				player1Score: userInformation[0].score ?? 0,
+				player2Username: userInformation[1].name,
+				player2Score: userInformation[1].score ?? 0,
+				gameRoomId: existingRoom.id,
+			}
+
 			io.to(existingRoom.id).emit('firstRound', firstRoundPayload, existingRoom.roundCount, playerData1, playerData2)
+			io.emit('liveGame', liveGamePayload)
 		}
 		catch (err) {
 			debug('ERROR creating or joining a game!')
