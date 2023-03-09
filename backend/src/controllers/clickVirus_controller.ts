@@ -83,12 +83,14 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 					const playerAverageReactionTime = Number(averageReactionTime(reactionTimes).toFixed(3))
 
 					// Save the average reaction time for each player in the database
-					await prisma.averageReactionTime.create({
-						data: {
-							name: user.name,
-							averageReactionTime: playerAverageReactionTime
-						}
-					})
+					if (user?.name !== null) {
+						await prisma.averageReactionTime.create({
+							data: {
+								name: user.name,
+								averageReactionTime: playerAverageReactionTime
+							}
+						})
+					}
 
 					return {
 						id: user.id,
@@ -100,9 +102,9 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 				}))
 
 				io.to(gameRoom.id).emit('endGame', userDataArray)
-	
-				const [ player1, player2 ] = gameRoom.users
-	
+
+				const [player1, player2] = gameRoom.users
+
 				// Before removing the room and user add the game to the ten latest games in database
 				await prisma.previousGame.create({
 					data: {
@@ -124,10 +126,10 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 					// Delete oldest game
 					await prisma.previousGame.delete({ where: { id: oldestGame.id } })
 				}
-	
+
 				const latestGames = await getLatestGames()
 				io.emit('tenLatestGames', latestGames)
-	
+
 				const deletedRoom = await deleteGameRoom(user.gameRoomId)
 				debug('Room deleted:', deletedRoom)
 
