@@ -26,10 +26,6 @@ export const calcAverageReactionTime = (reactionTimes: ReactionTime[]) => {
 		.reduce((sum, value) => sum + value, 0) / reactionTimes.length
 }
 
-export const getLatestGames = () => {
-	return prisma.previousGame.findMany({ orderBy: { date: 'desc' } })
-}
-
 export const getBestEverReactionTime = () => {
 	return prisma.reactionTime.findFirst({
 		where: { time: { not: null } },

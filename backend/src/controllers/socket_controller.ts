@@ -8,10 +8,10 @@ import { deleteUser, findUser } from '../services/user_service'
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/socket_types'
 import { deleteReactionTimes, findReactionTimesByUserId } from '../services/reactionTime_service'
 import { deleteGameRoom, findGameRoomById } from '../services/gameRoom_service'
-import { getBestAverageReactionTime, getBestEverReactionTime, getLatestGames } from './function_controller'
+import { getBestAverageReactionTime, getBestEverReactionTime } from './function_controller'
 import { listenForVirusClick } from './clickVirus_controller'
 import { availableGameRooms, listenForUserJoin } from './userJoin_controller'
-import prisma from '../prisma'
+import { getPreviousGames } from '../services/previousGame_service'
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
@@ -22,7 +22,7 @@ export const handleConnection = async (socket: Socket<ClientToServerEvents, Serv
 
 	// Get and emit the latetsGames
 	try {
-		const latestGames = await getLatestGames()
+		const latestGames = await getPreviousGames()
 		socket.emit('tenLatestGames', latestGames)
 
 	}

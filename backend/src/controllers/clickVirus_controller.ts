@@ -5,8 +5,9 @@ import { deleteGameRoom, findGameRoomById } from "../services/gameRoom_service"
 import { createReactionTime } from "../services/reactionTime_service"
 import { findUser, updateUsersVirusClicked } from "../services/user_service"
 import { ClientToServerEvents, NewRoundData, ServerToClientEvents } from "../types/shared/socket_types"
-import { calcAverageReactionTime, calcVirusData, getBestAverageReactionTime, getBestEverReactionTime, getLatestGames, updateScores } from "./function_controller"
+import { calcAverageReactionTime, calcVirusData, getBestAverageReactionTime, getBestEverReactionTime, updateScores } from "./function_controller"
 import { io } from "../../server"
+import { countPreviousGames, getPreviousGames, getOldestGame, deleteOldestGame, createPreviousGame } from "../services/previousGame_service"
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
@@ -106,29 +107,22 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 				const [player1, player2] = gameRoom.users
 
 				// Before removing the room and user add the game to the ten latest games in database
-				await prisma.previousGame.create({
-					data: {
-						player1: player1.name,
-						player2: player2.name,
-						player1Score: player1.score || 0,
-						player2Score: player2.score || 0,
-					},
-				})
+				await createPreviousGame(player1.name, player2.name, player1.score!, player2.score!)
 
 				// Count how many games there are in tenLatestGames
-				const latestGamesCount = await prisma.previousGame.count()
+				const latestGamesCount = await countPreviousGames()
 
 				if (latestGamesCount > 10) {
 					// Find oldest game
-					const oldestGame = await prisma.previousGame.findFirst({ orderBy: { date: 'asc' } })
+					const oldestGame = await getOldestGame()
 					if (!oldestGame) return
 
 					// Delete oldest game
-					await prisma.previousGame.delete({ where: { id: oldestGame.id } })
+					await deleteOldestGame(oldestGame.id)
 				}
 
 				// Get and emit the latetsGames
-				const latestGames = await getLatestGames()
+				const latestGames = await getPreviousGames()
 				io.emit('tenLatestGames', latestGames)
 
 				// Get and emit the best everReactionTime
