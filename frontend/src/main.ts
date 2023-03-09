@@ -93,11 +93,24 @@ socket.on('bestEverReactionTime', (username, time) => {
 	if (!highScoreElement) return
 
 	if (username && time) {
-		highScoreElement.textContent = `${username}: ${time} seconds`
+		highScoreElement.textContent = `${username} ${time} seconds`
 	} else {
 		highScoreElement.textContent = 'No high score yet'
 	}
 
+})
+
+// Handke best average reactio time here
+socket.on('bestAverageReactionTime', (username, time) => {
+	const averageHighScoreElement = document.querySelector('#averageHighScore')
+
+	if (!averageHighScoreElement) return
+
+	if (username && time) {
+		averageHighScoreElement.textContent = `${username} ${time} seconds`
+	} else {
+		averageHighScoreElement.textContent = 'No average high score yet'
+	}
 })
 
 socket.on('liveGame', (liveGameData) => {

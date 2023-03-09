@@ -8,7 +8,7 @@ import { deleteUser, findUser } from '../services/user_service'
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/socket_types'
 import { deleteReactionTimes, findReactionTimesByUserId } from '../services/reactionTime_service'
 import { deleteGameRoom, findGameRoomById } from '../services/gameRoom_service'
-import { getBestEverReactionTime, getLatestGames } from './function_controller'
+import { getBestAverageReactionTime, getBestEverReactionTime, getLatestGames } from './function_controller'
 import { listenForVirusClick } from './clickVirus_controller'
 import { listenForUserJoin } from './userJoin_controller'
 
@@ -22,6 +22,8 @@ export const handleConnection = async (socket: Socket<ClientToServerEvents, Serv
 	await getLatestGames()
 
 	await getBestEverReactionTime()
+
+	await getBestAverageReactionTime()
 
 	// Handle user disconnecting
 	socket.on('disconnect', async () => {
