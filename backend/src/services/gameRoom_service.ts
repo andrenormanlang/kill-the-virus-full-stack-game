@@ -26,6 +26,14 @@ export const updateGameRoomsUserCount = (gameRoomId: string, userCountData: { us
 	})
 }
 
+export const updateGameRoomsRoundCount = (gameRoomId: string) => {
+	return prisma.gameRoom.update({
+		where: { id: gameRoomId },
+		include: { users: true },
+		data: { roundCount: { increment: 1 } }
+	})
+}
+
 export const deleteGameRoom = (gameRoomId: string) => {
 	return prisma.gameRoom.delete({ where: { id: gameRoomId } })
 }

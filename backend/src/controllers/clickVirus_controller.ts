@@ -1,7 +1,7 @@
 import Debug from "debug"
 import prisma from "../prisma"
 import { Socket } from "socket.io"
-import { deleteGameRoom, findGameRoomById } from "../services/gameRoom_service"
+import { deleteGameRoom, findGameRoomById, updateGameRoomsRoundCount } from "../services/gameRoom_service"
 import { createReactionTime } from "../services/reactionTime_service"
 import { getUserById, updateUsersVirusClicked } from "../services/user_service"
 import { ClientToServerEvents, NewRoundData, ServerToClientEvents } from "../types/shared/socket_types"
@@ -55,11 +55,7 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 
 			await updateScores(gameRoom.id)
 
-			gameRoom = await prisma.gameRoom.update({
-				where: { id: gameRoom.id },
-				include: { users: true },
-				data: { roundCount: { increment: 1 } }
-			})
+			gameRoom = await updateGameRoomsRoundCount(gameRoom.id)
 
 			// For every round
 			if (gameRoom.roundCount <= 10) {
