@@ -134,16 +134,18 @@ socket.on('reactionTime', (reactionTime) => {
 })
 
 socket.on('firstRound', (firstRoundData, round, playerData1: PlayerData, playerData2: PlayerData) => {
-	const myId = socket.id
+	socket.emit('startGame', socket.id)
+
 	const yourNameEl = document.querySelector('.yourName') as HTMLDivElement
 	const opponentNameEl = document.querySelector('.opponentName') as HTMLDivElement
 	
-	if(myId === playerData1.id){
-		yourNameEl.innerHTML = `${playerData1.name} : `
-		opponentNameEl.innerHTML = `${playerData2.name} : `
-	}else{
-		yourNameEl.innerHTML = `${playerData2.name} : `
-		opponentNameEl.innerHTML = `${playerData1.name} : `
+	if(socket.id === playerData1.id){
+		yourNameEl.innerText = `${playerData1.name} : `
+		opponentNameEl.innerText = `${playerData2.name} : `
+	}
+	else{
+		yourNameEl.innerText = `${playerData2.name} : `
+		opponentNameEl.innerText = `${playerData1.name} : `
 	}
 
 	console.log('Round:', round)
@@ -181,7 +183,6 @@ usernameFormEl.addEventListener('submit', e => {
 	username = (usernameFormEl.querySelector('#username-input') as HTMLInputElement).value.trim()
 	if (!username) return
 
-	// socket.emit('userJoinedLobby', username)
 	socket.emit('userJoin', username)
 })
 

@@ -23,6 +23,7 @@ export interface ClientToServerEvents {
 	// userJoinedLobby: (username: string) => void
 	userJoin: (username: string) => void
 	clickVirus: (timeTakenToClick: number) => void
+	startGame: (userId: string) => void
 }
 
 export interface ReactionTimeData {
