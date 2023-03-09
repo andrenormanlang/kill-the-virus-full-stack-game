@@ -39,3 +39,9 @@ model PreviousGame {
     player2Score Int
     date         DateTime @default(now())
 }
+
+model AverageReactionTime {
+    id                  String @id @default(auto()) @map("_id") @db.ObjectId
+    name                String
+    averageReactionTime Float
+}

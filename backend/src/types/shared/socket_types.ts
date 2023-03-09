@@ -16,7 +16,8 @@ export interface ServerToClientEvents {
 	liveGame: (liveGameData: LiveGameData) => void
 	removeLiveGame: (gameRoomId: string) => void
 	tenLatestGames: (latestGames: LatestGamesData[]) => void
-	bestEverReactionTime: (userName: string | null, time: number | null) => void;
+	bestEverReactionTime: (userName: string | null, time: number | null) => void
+	bestAverageReactionTime: (userName: string | null, averageReactionTime: number) => void
 }
 
 // Events emitted by the client to the server
