@@ -107,7 +107,7 @@ socket.on('bestAverageReactionTime', (username, time) => {
 
 socket.on('liveGame', (liveGameData) => {
 	const { player1Username, player1Score, player2Username, player2Score, gameRoomId } = liveGameData
-	const gameInfo = `${player1Username} ${player1Score} : ${player2Score} ${player2Username}`
+	const gameInfo = `${player1Username} ${player1Score} <span class = "emoji"> ⚔️ </span> ${player2Score} ${player2Username}`
 
 	const existingGameListItem = document.getElementById(gameRoomId)
 	existingGameListItem
@@ -156,12 +156,12 @@ socket.on('reactionTime', (reactionTime) => {
 socket.on('firstRound', (firstRoundData, round, playerData1: PlayerData, playerData2: PlayerData) => {
 	const yourNameEl = document.querySelector('.yourName') as HTMLDivElement
 	const opponentNameEl = document.querySelector('.opponentName') as HTMLDivElement
-	
-	if(socket.id === playerData1.id){
+
+	if (socket.id === playerData1.id) {
 		yourNameEl.innerText = `${playerData1.name} : `
 		opponentNameEl.innerText = `${playerData2.name} : `
 	}
-	else{
+	else {
 		yourNameEl.innerText = `${playerData2.name} : `
 		opponentNameEl.innerText = `${playerData1.name} : `
 	}
