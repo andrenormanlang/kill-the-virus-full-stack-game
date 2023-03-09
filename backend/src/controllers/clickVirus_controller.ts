@@ -143,10 +143,9 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 				const averageReactionTime = bestAverageReactionTime?.averageReactionTime ?? 0
 				io.emit('bestAverageReactionTime', name, averageReactionTime)
 
-				const deletedRoom = await deleteGameRoom(user.gameRoomId)
-				debug('Room deleted:', deletedRoom)
-
+				// Delete the gameRoom from the database and live games
 				io.emit('removeLiveGame', gameRoom.id)
+				deleteGameRoom(user.gameRoomId)
 			}
 		}
 		catch (err) {

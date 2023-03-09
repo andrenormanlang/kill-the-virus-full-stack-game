@@ -66,11 +66,6 @@ export const handleConnection = async (socket: Socket<ClientToServerEvents, Serv
 
 			io.emit('removeLiveGame', user.gameRoomId)
 
-			const reactionTimes = await findReactionTimesByUserId(user.id)
-			if (!reactionTimes) return
-			const deletedReactionTimes = await deleteReactionTimes(user.id)
-			debug('Reaction times deleted:', deletedReactionTimes)
-
 			const deletedUser = await deleteUser(user.id)
 			debug('User deleted:', deletedUser.name)
 
