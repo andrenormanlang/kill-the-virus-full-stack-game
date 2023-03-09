@@ -4,7 +4,11 @@
 import prisma from '../prisma'
 import { UserData } from '../types/shared/socket_types'
 
-export const findUser = (userId: string) => {
+export const getUsersInRoom = (gameRoomId: string) => {
+	return prisma.user.findMany({ where: { gameRoomId } })
+}
+
+export const getUserById = (userId: string) => {
 	return prisma.user.findUnique({ where: { id: userId } })
 }
 
@@ -16,6 +20,13 @@ export const updateUsersVirusClicked = (userId: string, virusClickedData: { viru
 	return prisma.user.update({
 		where: { id: userId },
 		data: virusClickedData,
+	})
+}
+
+export const updateUsersScore = (userId: string) => {
+	return prisma.user.update({
+		where: { id: userId },
+		data: { score: { increment: 1 } }
 	})
 }
 

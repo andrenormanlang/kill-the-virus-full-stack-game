@@ -6,6 +6,7 @@ import prisma from '../prisma'
 import { io } from '../../server'
 import { LiveGameData } from '../types/shared/socket_types'
 import { ReactionTime } from '@prisma/client'
+import { getUsersInRoom, updateUsersScore } from '../services/user_service'
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
@@ -50,19 +51,9 @@ export const updateScores = async (gameRoomId: string) => {
 		const winner = latestReactionTimes.sort((reactionTime1, reactionTime2) => reactionTime1.time! - reactionTime2.time!)[0].user!
 		debug('winner:', winner)
 
-		await prisma.user.update({
-			where: { id: winner.id },
-			data: { score: { increment: 1 } }
-		})
+		await updateUsersScore(winner.id)
 
-		const players = await prisma.user.findMany({
-			where: { gameRoom: { id: gameRoomId } },
-			select: {
-				id: true,
-				name: true,
-				score: true
-			}
-		})
+		const players = await getUsersInRoom(gameRoomId)
 
 		const player1Score = players[0].score ?? 0
 		const player2Score = players[1].score ?? 0

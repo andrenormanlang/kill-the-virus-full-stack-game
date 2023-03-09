@@ -3,7 +3,7 @@ import prisma from "../prisma"
 import { Socket } from "socket.io"
 import { deleteGameRoom, findGameRoomById } from "../services/gameRoom_service"
 import { createReactionTime } from "../services/reactionTime_service"
-import { findUser, updateUsersVirusClicked } from "../services/user_service"
+import { getUserById, updateUsersVirusClicked } from "../services/user_service"
 import { ClientToServerEvents, NewRoundData, ServerToClientEvents } from "../types/shared/socket_types"
 import { calcAverageReactionTime, calcVirusData, getBestEverReactionTime, updateScores } from "./function_controller"
 import { io } from "../../server"
@@ -19,7 +19,7 @@ const debug = Debug('ktv:socket_controller')
 export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
 	socket.on('clickVirus', async (timeTakenToClick) => {
 		try {
-			const user = await findUser(socket.id)
+			const user = await getUserById(socket.id)
 			if (!user) return
 
 			// Update the users virusClicked to 'true'

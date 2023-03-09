@@ -3,11 +3,10 @@
  */
 
 import Debug from "debug"
-import prisma from "../prisma"
 import { io } from "../../server"
 import { Socket } from "socket.io"
 import { createGameRoom, deleteGameRoom, findGameRoomById, findGameRoomByUserCount, updateGameRoomsUserCount } from "../services/gameRoom_service"
-import { createUser, deleteUser, findUser } from "../services/user_service"
+import { createUser, deleteUser, getUserById, getUsersInRoom } from "../services/user_service"
 import { ClientToServerEvents, LiveGameData, PlayerData, ServerToClientEvents } from "../types/shared/socket_types"
 import { calcVirusData, updateScores } from "./function_controller"
 import { GameRoom } from "@prisma/client"
@@ -61,7 +60,7 @@ export const listenForUserJoin = (socket: Socket<ClientToServerEvents, ServerToC
 				delay: virusData.delay,
 			}
 
-			const userInformation = await prisma.user.findMany({ where: { gameRoomId: existingRoom.id } })
+			const userInformation = await getUsersInRoom(existingRoom.id)
 
 			const playerData1: PlayerData = {
 				id: userInformation[0].id,

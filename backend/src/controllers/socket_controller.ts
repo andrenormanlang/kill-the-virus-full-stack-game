@@ -4,7 +4,7 @@
 import Debug from 'debug'
 import { io } from '../../server'
 import { Socket } from 'socket.io'
-import { deleteUser, findUser } from '../services/user_service'
+import { deleteUser, getUserById } from '../services/user_service'
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/socket_types'
 import { deleteReactionTimes, findReactionTimesByUserId } from '../services/reactionTime_service'
 import { deleteGameRoom, findGameRoomById } from '../services/gameRoom_service'
@@ -62,7 +62,7 @@ export const handleConnection = async (socket: Socket<ClientToServerEvents, Serv
 		debug('✌🏻 A user disconnected', socket.id)
 
 		try {
-			const user = await findUser(socket.id)
+			const user = await getUserById(socket.id)
 			if (!user) return
 
 			io.emit('removeLiveGame', user.gameRoomId)
