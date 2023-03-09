@@ -25,6 +25,11 @@ export const getBestEverReactionTime = () => {
 	})
 }
 
-export const createReactionTime = (data: ReactionTimeData) => {
-	return prisma.reactionTime.create({ data })
+export const createReactionTime = (timeTakenToClick: number, userId: string) => {
+	return prisma.reactionTime.create({
+		data: {
+			time: timeTakenToClick,
+			userId,
+		}
+	})
 }

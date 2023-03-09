@@ -4,6 +4,10 @@
 import prisma from '../prisma'
 import { GameRoomData } from '../types/shared/socket_types'
 
+export const findGameRooms = () => {
+	return prisma.gameRoom.findMany({ include: { users: true } })
+}
+
 export const findGameRoomById = (gameRoomId: string) => {
 	return prisma.gameRoom.findUnique({
 		where: { id: gameRoomId },

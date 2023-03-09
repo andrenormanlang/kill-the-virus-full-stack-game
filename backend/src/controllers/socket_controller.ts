@@ -5,13 +5,14 @@ import Debug from 'debug'
 import { io } from '../../server'
 import { Socket } from 'socket.io'
 import { deleteUser, getUserById } from '../services/user_service'
-import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/socket_types'
+import { ClientToServerEvents, LiveGameData, ServerToClientEvents } from '../types/shared/socket_types'
 import { getBestEverReactionTime } from '../services/reactionTime_service'
-import { deleteGameRoom, findGameRoomById } from '../services/gameRoom_service'
+import { deleteGameRoom, findGameRoomById, findGameRooms } from '../services/gameRoom_service'
 import { listenForVirusClick } from './clickVirus_controller'
 import { availableGameRooms, listenForUserJoin } from './userJoin_controller'
 import { getPreviousGames } from '../services/previousGame_service'
 import { getBestAverageReactionTime } from '../services/averageReactionTime_service'
+import prisma from '../prisma'
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
@@ -19,6 +20,29 @@ const debug = Debug('ktv:socket_controller')
 // Handle the user connecting
 export const handleConnection = async (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
 	debug('🙋🏼 A user connected -', socket.id)
+
+	// Get and emit the live games to the user
+	try {
+		// Get the live games
+		const liveGameRooms = await findGameRooms()
+
+		// Create a payload for every live game
+		const liveGames = await Promise.all(liveGameRooms.map((game) => {
+			return {
+				player1Username: game.users[0].name,
+				player1Score: game.users[0].score!,
+				player2Username: game.users[1].name,
+				player2Score: game.users[1].score!,
+				gameRoomId: game.id,
+			}
+		}))
+
+		// Send the live games to the frontend
+		socket.emit('liveGames', liveGames)
+	}
+	catch (err) {
+		debug('Could not get the live games')
+	}
 
 	// Get and emit the latetsGames
 	try {

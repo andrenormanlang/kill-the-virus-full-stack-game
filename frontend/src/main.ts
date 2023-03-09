@@ -109,6 +109,14 @@ socket.on('liveGame', (liveGameData) => {
 		`
 })
 
+socket.on('liveGames', (liveGames) => {
+	liveGames.forEach((game) => {
+		(document.getElementById("gameList") as HTMLUListElement).innerHTML += `
+			<li id="${game.gameRoomId}">${game.player1Username} ${game.player1Score} <span class = "emoji"> ⚔️ </span> ${game.player2Username} ${game.player2Score}</li>
+		`
+	})
+})
+
 socket.on('removeLiveGame', (gameRoomId) => {
 	const listItemToRemove = document.getElementById(gameRoomId)
 	if (listItemToRemove) {
