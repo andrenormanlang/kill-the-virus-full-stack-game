@@ -27,9 +27,7 @@ export const averageReactionTime = (reactionTimes: ReactionTime[]) => {
 }
 
 export const getLatestGames = async () => {
-	const latestGames = await prisma.previousGame.findMany({ orderBy: { date: 'desc' } })
-
-	io.emit('tenLatestGames', latestGames)
+	return prisma.previousGame.findMany({ orderBy: { date: 'desc' } })
 }
 
 export const getBestEverReactionTime = async () => {

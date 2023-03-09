@@ -97,7 +97,7 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 	
 				const [ player1, player2 ] = gameRoom.users
 	
-				// Before removing the room and user add the game to the ten latest game in database
+				// Before removing the room and user add the game to the ten latest games in database
 				await prisma.previousGame.create({
 					data: {
 						player1: player1.name,
@@ -119,7 +119,8 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 					await prisma.previousGame.delete({ where: { id: oldestGame.id } })
 				}
 	
-				await getLatestGames()
+				const latestGames = await getLatestGames()
+				io.emit('tenLatestGames', latestGames)
 	
 				const deletedRoom = await deleteGameRoom(user.gameRoomId)
 				debug('Room deleted:', deletedRoom)

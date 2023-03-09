@@ -20,7 +20,9 @@ const debug = Debug('ktv:socket_controller')
 export const handleConnection = async (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
 	debug('🙋🏼 A user connected -', socket.id)
 
-	await getLatestGames()
+	const latestGames = await getLatestGames()
+
+	socket.emit('tenLatestGames', latestGames)
 
 	await getBestEverReactionTime()
 
