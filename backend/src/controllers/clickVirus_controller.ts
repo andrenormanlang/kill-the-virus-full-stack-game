@@ -28,18 +28,20 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 			if (!gameRoom) return
 
 			// Save each players reaction time in the database
-			await createReactionTime({
-				time: timeTakenToClick,
-				userId: user.id
-			})
+			await createReactionTime(timeTakenToClick, user.id)
+
+			// Get and emit the best everReactionTime
+			const bestEverReactionTime = await getBestEverReactionTime()
+			const userName = bestEverReactionTime?.user?.name ?? null
+			const time = bestEverReactionTime?.time ?? null
+			io.emit('bestEverReactionTime', userName, time)
 
 			socket.broadcast.to(gameRoom.id).emit('reactionTime', timeTakenToClick)
 
 			// Counts how many viruses are clicked by users (from 0 to 2)
 			let virusesGone = 0
+			
 			// Check every players 'virusClicked'. If it's 'true' increase 'virusesGone' by 1
-			// After the first player clicks virusesGone = 1
-			// After the second player clicks virusesGone = 2
 			gameRoom.users.forEach(user => {
 				if (user.virusClicked) virusesGone++
 			})
@@ -110,12 +112,6 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 				// Get and emit the latetsGames
 				const latestGames = await getPreviousGames()
 				io.emit('tenLatestGames', latestGames)
-
-				// Get and emit the best everReactionTime
-				const bestEverReactionTime = await getBestEverReactionTime()
-				const userName = bestEverReactionTime?.user?.name ?? null
-				const time = bestEverReactionTime?.time ?? null
-				io.emit('bestEverReactionTime', userName, time)
 
 				// Get and emit the bestAverageReactionTime
 				const bestAverageReactionTime = await getBestAverageReactionTime()
