@@ -36,7 +36,6 @@ export const getBestEverReactionTime = async () => {
 		orderBy: { time: 'asc' },
 		include: { user: true },
 	})
-	debug(bestEverReactionTime)
 
 	const userName = bestEverReactionTime?.user?.name ?? null;
 	const time = bestEverReactionTime?.time ?? null;

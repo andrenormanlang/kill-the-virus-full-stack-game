@@ -10,7 +10,7 @@ import { deleteReactionTimes, findReactionTimesByUserId } from '../services/reac
 import { deleteGameRoom, findGameRoomById } from '../services/gameRoom_service'
 import { getBestAverageReactionTime, getBestEverReactionTime, getLatestGames } from './function_controller'
 import { listenForVirusClick } from './clickVirus_controller'
-import { listenForUserJoin } from './userJoin_controller'
+import { availableGameRooms, listenForUserJoin } from './userJoin_controller'
 import prisma from '../prisma'
 
 // Create a new debug instance
@@ -46,9 +46,11 @@ export const handleConnection = async (socket: Socket<ClientToServerEvents, Serv
 
 			const gameRoom = await findGameRoomById(user.gameRoomId)
 			if (!gameRoom) return
+
+			availableGameRooms.pop()
+
 			const deletedRoom = await deleteGameRoom(user.gameRoomId)
 			debug('Room deleted:', deletedRoom)
-
 		}
 		catch (err) {
 			debug('ERROR finding or deleting one of following: reactionTimes, user, gameRoom')

@@ -6,16 +6,17 @@ import Debug from "debug"
 import prisma from "../prisma"
 import { io } from "../../server"
 import { Socket } from "socket.io"
-import { createGameRoom, findGameRoomByUserCount, updateGameRoomsUserCount } from "../services/gameRoom_service"
-import { createUser } from "../services/user_service"
+import { createGameRoom, deleteGameRoom, findGameRoomById, findGameRoomByUserCount, updateGameRoomsUserCount } from "../services/gameRoom_service"
+import { createUser, deleteUser, findUser } from "../services/user_service"
 import { ClientToServerEvents, LiveGameData, PlayerData, ServerToClientEvents } from "../types/shared/socket_types"
 import { calcVirusData, updateScores } from "./function_controller"
 import { GameRoom } from "@prisma/client"
+import { deleteReactionTimes, findReactionTimesByUserId } from "../services/reactionTime_service"
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
 
-let availableGameRooms: GameRoom[] = []
+export let availableGameRooms: GameRoom[] = []
 
 export const listenForUserJoin = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
 	socket.on('userJoin', async (username) => {
