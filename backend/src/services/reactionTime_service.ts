@@ -8,14 +8,23 @@ export const findReactionTimesByUserId = (userId: string) => {
 	return prisma.reactionTime.findMany({ where: { userId } })
 }
 
-export const findReactionTimesByRoomId = (gameRoomId: string) => {
-	return prisma.reactionTime.findMany({ where: { id: gameRoomId } })
+export const findRecentReactionTimes = (gameRoomId: string) => {
+	return prisma.reactionTime.findMany({
+		where: { user: { gameRoomId } },
+		take: 2,
+		orderBy: { id: 'desc' },
+		include: { user: true }
+	})
+}
+
+export const getBestEverReactionTime = () => {
+	return prisma.reactionTime.findFirst({
+		where: { time: { not: null } },
+		orderBy: { time: 'asc' },
+		include: { user: true },
+	})
 }
 
 export const createReactionTime = (data: ReactionTimeData) => {
 	return prisma.reactionTime.create({ data })
-}
-
-export const deleteReactionTimes = (userId: string) => {
-	return prisma.reactionTime.deleteMany({ where: { userId } })
 }

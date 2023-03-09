@@ -1,11 +1,10 @@
 import Debug from "debug"
-import prisma from "../prisma"
 import { Socket } from "socket.io"
 import { deleteGameRoom, findGameRoomById, updateGameRoomsRoundCount } from "../services/gameRoom_service"
-import { createReactionTime } from "../services/reactionTime_service"
+import { createReactionTime, findReactionTimesByUserId, getBestEverReactionTime } from "../services/reactionTime_service"
 import { getUserById, updateUsersVirusClicked } from "../services/user_service"
 import { ClientToServerEvents, NewRoundData, ServerToClientEvents } from "../types/shared/socket_types"
-import { calcAverageReactionTime, calcVirusData, getBestEverReactionTime, updateScores } from "./function_controller"
+import { calcAverageReactionTime, calcVirusData, updateScores } from "./function_controller"
 import { io } from "../../server"
 import { countPreviousGames, getPreviousGames, getOldestGame, deleteOldestGame, createPreviousGame } from "../services/previousGame_service"
 import { createAverageReactionTime, getBestAverageReactionTime } from "../services/averageReactionTime_service"
@@ -74,9 +73,7 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 			else {
 				// Returns an array of UserData objects for every user
 				const userDataArray = await Promise.all(gameRoom.users.map(async (user) => {
-					const reactionTimes = await prisma.reactionTime.findMany({
-						where: { userId: user.id }
-					})
+					const reactionTimes = await findReactionTimesByUserId(user.id)
 
 					const averageReactionTime = Number(calcAverageReactionTime(reactionTimes).toFixed(3))
 

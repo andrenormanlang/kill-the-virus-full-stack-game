@@ -10,7 +10,6 @@ import { createUser, deleteUser, getUserById, getUsersInRoom } from "../services
 import { ClientToServerEvents, LiveGameData, PlayerData, ServerToClientEvents } from "../types/shared/socket_types"
 import { calcVirusData, updateScores } from "./function_controller"
 import { GameRoom } from "@prisma/client"
-import { deleteReactionTimes, findReactionTimesByUserId } from "../services/reactionTime_service"
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')

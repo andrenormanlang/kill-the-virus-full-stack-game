@@ -2,11 +2,11 @@
  * Function Controller
  */
 import Debug from 'debug'
-import prisma from '../prisma'
 import { io } from '../../server'
 import { LiveGameData } from '../types/shared/socket_types'
 import { ReactionTime } from '@prisma/client'
 import { getUsersInRoom, updateUsersScore } from '../services/user_service'
+import { findRecentReactionTimes } from '../services/reactionTime_service'
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
@@ -27,23 +27,9 @@ export const calcAverageReactionTime = (reactionTimes: ReactionTime[]) => {
 		.reduce((sum, value) => sum + value, 0) / reactionTimes.length
 }
 
-export const getBestEverReactionTime = () => {
-	return prisma.reactionTime.findFirst({
-		where: { time: { not: null } },
-		orderBy: { time: 'asc' },
-		include: { user: true },
-	})
-}
-
 export const updateScores = async (gameRoomId: string) => {
 	try {
-		const latestReactionTimes = await prisma.reactionTime.findMany({
-			where: { user: { gameRoomId: gameRoomId } },
-			take: 2,
-			orderBy: { id: 'desc' },
-			include: { user: true }
-		})
-		debug('latestReactionTimes:', latestReactionTimes)
+		const latestReactionTimes = await findRecentReactionTimes(gameRoomId)
 
 		if (!(latestReactionTimes[0].time && latestReactionTimes[1].time)) return
 
