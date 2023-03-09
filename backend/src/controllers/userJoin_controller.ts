@@ -8,8 +8,8 @@ import { io } from "../../server"
 import { Socket } from "socket.io"
 import { createGameRoom, findGameRoomByUserCount, updateGameRoomsUserCount } from "../services/gameRoom_service"
 import { createUser } from "../services/user_service"
-import { ClientToServerEvents, PlayerData, ServerToClientEvents } from "../types/shared/socket_types"
-import { calcVirusData } from "./function_controller"
+import { ClientToServerEvents, LiveGameData, PlayerData, ServerToClientEvents } from "../types/shared/socket_types"
+import { calcVirusData, updateScores } from "./function_controller"
 import { GameRoom } from "@prisma/client"
 
 // Create a new debug instance
@@ -72,7 +72,16 @@ export const listenForUserJoin = (socket: Socket<ClientToServerEvents, ServerToC
 				name: userInformation[1].name
 			}
 
+			const liveGamePayload: LiveGameData = {
+				player1Username: userInformation[0].name,
+				player1Score: userInformation[0].score ?? 0,
+				player2Username: userInformation[1].name,
+				player2Score: userInformation[1].score ?? 0,
+				gameRoomId: existingRoom.id,
+			}
+
 			io.to(existingRoom.id).emit('firstRound', firstRoundPayload, existingRoom.roundCount, playerData1, playerData2)
+			io.emit('liveGame', liveGamePayload)
 		}
 		catch (err) {
 			debug('ERROR creating or joining a game!')
