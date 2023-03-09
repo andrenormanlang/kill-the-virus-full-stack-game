@@ -60,7 +60,6 @@ export interface NewRoundData {
 	row: number
 	column: number
 	delay: number
-	round: number
 }
 
 export interface LiveGameData {

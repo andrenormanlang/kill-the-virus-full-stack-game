@@ -61,14 +61,8 @@ const displayVirus = (virusData: VirusData) => {
 	}, delay)
 }
 
-socket.on('connect', () => {
-	console.log('Connected to server')
-})
-
 // Handle the latestGames data here
 socket.on('tenLatestGames', (latestGames) => {
-	console.log('Latest games:', latestGames)
-
 	const gamesAsListItems = latestGames
 		.map(game => `<li>${game.player1} ${game.player1Score} - ${game.player2Score} ${game.player2}</li>`)
 		.join('');
@@ -79,7 +73,6 @@ socket.on('tenLatestGames', (latestGames) => {
 // Handle best ever raction time here 
 socket.on('bestEverReactionTime', (username, time) => {
 	const highScoreElement = document.querySelector('#highScore')
-	console.log('bestEverReactionTime')
 
 	if (!highScoreElement) return
 
@@ -94,7 +87,6 @@ socket.on('bestEverReactionTime', (username, time) => {
 // Handke best average reactio time here
 socket.on('bestAverageReactionTime', (username, time) => {
 	const averageHighScoreElement = document.querySelector('#averageHighScore')
-	console.log('bestAverageReactionTime')
 
 	if (!averageHighScoreElement) return
 
@@ -144,13 +136,10 @@ socket.on('endGame', (userDataArray) => {
 		opponentReactionTimeEl.innerText = `Opponents average reaction time: ${userData1.averageReactionTime!.toFixed(2)}`
 		opponentScoreEl.innerText = `Opponent score: ${userData1.score}`
 	}
-
-	console.log('Game ended, goodbye.')
 })
 
 socket.on('reactionTime', (reactionTime) => {
 	(document.querySelector('#opponentTime') as HTMLDivElement).innerText = ` ${reactionTime}`
-	console.log('Opponent:', reactionTime)
 })
 
 socket.on('firstRound', (firstRoundData, round, playerData1: PlayerData, playerData2: PlayerData) => {
@@ -166,7 +155,6 @@ socket.on('firstRound', (firstRoundData, round, playerData1: PlayerData, playerD
 		opponentNameEl.innerText = `${playerData1.name} : `
 	}
 
-	console.log('Round:', round)
 	// Hide lobby and show game
 	lobbyEl.style.display = 'none'
 	gameEl.style.display = 'block'
@@ -175,9 +163,7 @@ socket.on('firstRound', (firstRoundData, round, playerData1: PlayerData, playerD
 })
 
 socket.on('newRound', (newRoundData) => {
-	const { row, column, delay, round } = newRoundData
-	console.log('Round:', round)
-
+	const { row, column, delay} = newRoundData
 	displayVirus({ row, column, delay })
 })
 
@@ -192,8 +178,6 @@ socket.on('updateScore', (player1Score: number, player2Score: number, player1Id:
 })
 
 socket.on('opponentLeft', () => {
-	console.log('opponent left :(')
-
 	winnerTitleEl.innerText = 'Opponent left'
 	lobbyEl.style.display = 'none'
 	gameEl.style.display = 'none'
@@ -222,8 +206,7 @@ gameScreenEl.addEventListener("click", e => {
 
 	startTimer(false)
 
-	const timeTakenToClick = counter
-	console.log('My time:', timeTakenToClick);
+	const timeTakenToClick = counter;
 	(document.querySelector('#myTime') as HTMLDivElement).innerText = ` ${timeTakenToClick}`
 
 	socket.emit('clickVirus', timeTakenToClick)

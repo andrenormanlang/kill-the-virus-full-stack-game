@@ -5,10 +5,10 @@
 import Debug from "debug"
 import { io } from "../../server"
 import { Socket } from "socket.io"
-import { createGameRoom, deleteGameRoom, findGameRoomById, findGameRoomByUserCount, updateGameRoomsUserCount } from "../services/gameRoom_service"
-import { createUser, deleteUser, getUserById, getUsersInRoom } from "../services/user_service"
+import { createGameRoom, updateGameRoomsUserCount } from "../services/gameRoom_service"
+import { createUser, getUsersInRoom } from "../services/user_service"
 import { ClientToServerEvents, LiveGameData, PlayerData, ServerToClientEvents } from "../types/shared/socket_types"
-import { calcVirusData, updateScores } from "./function_controller"
+import { calcVirusData } from "./function_controller"
 import { GameRoom } from "@prisma/client"
 
 // Create a new debug instance

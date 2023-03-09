@@ -64,7 +64,6 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 					row: virusData.row,
 					column: virusData.column,
 					delay: virusData.delay,
-					round: gameRoom.roundCount,
 				}
 				// Give the next virus to both players
 				io.to(gameRoom.id).emit('newRound', newRoundPayload)
