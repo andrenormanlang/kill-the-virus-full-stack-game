@@ -5,7 +5,7 @@ import { deleteGameRoom, findGameRoomById } from "../services/gameRoom_service"
 import { createReactionTime } from "../services/reactionTime_service"
 import { findUser, updateUsersVirusClicked } from "../services/user_service"
 import { ClientToServerEvents, NewRoundData, ServerToClientEvents } from "../types/shared/socket_types"
-import { averageReactionTime, calcVirusData, getLatestGames, updateScores } from "./function_controller"
+import { calcAverageReactionTime, calcVirusData, getBestAverageReactionTime, getBestEverReactionTime, getLatestGames, updateScores } from "./function_controller"
 import { io } from "../../server"
 
 // Create a new debug instance
@@ -80,10 +80,10 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 						where: { userId: user.id }
 					})
 
-					const playerAverageReactionTime = Number(averageReactionTime(reactionTimes).toFixed(3))
+					const playerAverageReactionTime = Number(calcAverageReactionTime(reactionTimes).toFixed(3))
 
 					// Save the average reaction time for each player in the database
-					if (user?.name !== null) {
+					if (user.name !== null) {
 						await prisma.averageReactionTime.create({
 							data: {
 								name: user.name,
@@ -127,8 +127,21 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 					await prisma.previousGame.delete({ where: { id: oldestGame.id } })
 				}
 
+				// Get and emit the latetsGames
 				const latestGames = await getLatestGames()
 				io.emit('tenLatestGames', latestGames)
+
+				// Get and emit the best everReactionTime
+				const bestEverReactionTime = await getBestEverReactionTime()
+				const userName = bestEverReactionTime?.user?.name ?? null
+				const time = bestEverReactionTime?.time ?? null
+				io.emit('bestEverReactionTime', userName, time)
+
+				// Get and emit the bestAverageReactionTime
+				const bestAverageReactionTime = await getBestAverageReactionTime()
+				const name = bestAverageReactionTime?.name ?? null
+				const averageReactionTime = bestAverageReactionTime?.averageReactionTime ?? 0
+				io.emit('bestAverageReactionTime', name, averageReactionTime)
 
 				const deletedRoom = await deleteGameRoom(user.gameRoomId)
 				debug('Room deleted:', deletedRoom)

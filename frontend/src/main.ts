@@ -85,6 +85,7 @@ socket.on('tenLatestGames', (latestGames) => {
 // Handle best ever raction time here 
 socket.on('bestEverReactionTime', (username, time) => {
 	const highScoreElement = document.querySelector('#highScore')
+	console.log('bestEverReactionTime')
 
 	if (!highScoreElement) return
 
@@ -99,6 +100,7 @@ socket.on('bestEverReactionTime', (username, time) => {
 // Handke best average reactio time here
 socket.on('bestAverageReactionTime', (username, time) => {
 	const averageHighScoreElement = document.querySelector('#averageHighScore')
+	console.log('bestAverageReactionTime')
 
 	if (!averageHighScoreElement) return
 

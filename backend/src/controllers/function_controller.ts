@@ -20,38 +20,28 @@ export const calcVirusData = () => {
 }
 
 // Calculate the average time of 10 rounds
-export const averageReactionTime = (reactionTimes: ReactionTime[]) => {
+export const calcAverageReactionTime = (reactionTimes: ReactionTime[]) => {
 	return reactionTimes
 		.map((reactionTime) => reactionTime.time!)
 		.reduce((sum, value) => sum + value, 0) / reactionTimes.length
 }
 
-export const getLatestGames = async () => {
+export const getLatestGames = () => {
 	return prisma.previousGame.findMany({ orderBy: { date: 'desc' } })
 }
 
-export const getBestEverReactionTime = async () => {
-	const bestEverReactionTime = await prisma.reactionTime.findFirst({
+export const getBestEverReactionTime = () => {
+	return prisma.reactionTime.findFirst({
 		where: { time: { not: null } },
 		orderBy: { time: 'asc' },
 		include: { user: true },
 	})
-
-	const userName = bestEverReactionTime?.user?.name ?? null;
-	const time = bestEverReactionTime?.time ?? null;
-
-	io.emit('bestEverReactionTime', userName, time)
 }
 
-export const getBestAverageReactionTime = async () => {
-	const bestAverageReactionTime = await prisma.averageReactionTime.findFirst({
+export const getBestAverageReactionTime = () => {
+	return prisma.averageReactionTime.findFirst({
 		orderBy: { averageReactionTime: 'asc' },
 	})
-
-	const userName = bestAverageReactionTime?.name ?? null
-	const averageReactionTime = bestAverageReactionTime?.averageReactionTime ?? 0
-
-	io.emit('bestAverageReactionTime', userName, averageReactionTime)
 }
 
 export const updateScores = async (gameRoomId: string) => {
