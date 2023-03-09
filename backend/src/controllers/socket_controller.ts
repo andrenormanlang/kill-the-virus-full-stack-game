@@ -20,17 +20,6 @@ const debug = Debug('ktv:socket_controller')
 export const handleConnection = async (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
 	debug('🙋🏼 A user connected -', socket.id)
 
-	// When entering the site, join the lobby
-	try {
-		const lobby	= await prisma.lobby.findFirst()
-		if (!lobby) return
-
-		socket.join(lobby.id)
-	}
-	catch (err) {
-		debug('Could not find lobby to join')
-	}
-
 	await getLatestGames()
 
 	// Handle user disconnecting
@@ -62,8 +51,10 @@ export const handleConnection = async (socket: Socket<ClientToServerEvents, Serv
 		}
 	})
 
+	// socket.on('userJoin')
 	listenForUserJoin(socket)
 
+	// socket.on('virusClick')
 	listenForVirusClick(socket)
 }
 

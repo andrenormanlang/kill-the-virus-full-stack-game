@@ -38,9 +38,9 @@ export const listenForUserJoin = (socket: Socket<ClientToServerEvents, ServerToC
 				return
 			}
 
+			// Join the existing gameRoom
 			const existingRoom = availableGameRooms.pop()!
 
-			// Continue if there is no existing lobby
 			const user = await createUser({
 				id: socket.id,
 				name: username,
@@ -73,23 +73,6 @@ export const listenForUserJoin = (socket: Socket<ClientToServerEvents, ServerToC
 			}
 
 			io.to(existingRoom.id).emit('firstRound', firstRoundPayload, existingRoom.roundCount, playerData1, playerData2)
-
-
-
-			const playerIds: string[] = []
-
-			socket.on('startGame', async (userId) => {
-				const gameRoom = await prisma.gameRoom.findUnique({
-					where: { id: user.gameRoomId },
-					include: { users: true }
-				})
-				if (!gameRoom) return
-
-				gameRoom.users.forEach((user) => {
-					playerIds.push(user.id)
-				})
-				debug(playerIds)
-			})
 		}
 		catch (err) {
 			debug('ERROR creating or joining a game!')

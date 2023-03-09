@@ -39,7 +39,3 @@ model PreviousGame {
     player2Score Int
     date         DateTime @default(now())
 }
-
-model Lobby {
-    id String @id @default(auto()) @map("_id") @db.ObjectId
-}
