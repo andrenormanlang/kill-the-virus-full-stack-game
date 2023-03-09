@@ -5,9 +5,10 @@ import { deleteGameRoom, findGameRoomById } from "../services/gameRoom_service"
 import { createReactionTime } from "../services/reactionTime_service"
 import { findUser, updateUsersVirusClicked } from "../services/user_service"
 import { ClientToServerEvents, NewRoundData, ServerToClientEvents } from "../types/shared/socket_types"
-import { calcAverageReactionTime, calcVirusData, getBestAverageReactionTime, getBestEverReactionTime, updateScores } from "./function_controller"
+import { calcAverageReactionTime, calcVirusData, getBestEverReactionTime, updateScores } from "./function_controller"
 import { io } from "../../server"
 import { countPreviousGames, getPreviousGames, getOldestGame, deleteOldestGame, createPreviousGame } from "../services/previousGame_service"
+import { createAverageReactionTime, getBestAverageReactionTime } from "../services/averageReactionTime_service"
 
 // Create a new debug instance
 const debug = Debug('ktv:socket_controller')
@@ -81,24 +82,17 @@ export const listenForVirusClick = (socket: Socket<ClientToServerEvents, ServerT
 						where: { userId: user.id }
 					})
 
-					const playerAverageReactionTime = Number(calcAverageReactionTime(reactionTimes).toFixed(3))
+					const averageReactionTime = Number(calcAverageReactionTime(reactionTimes).toFixed(3))
 
 					// Save the average reaction time for each player in the database
-					if (user.name !== null) {
-						await prisma.averageReactionTime.create({
-							data: {
-								name: user.name,
-								averageReactionTime: playerAverageReactionTime
-							}
-						})
-					}
+					await createAverageReactionTime(user.name, averageReactionTime)
 
 					return {
 						id: user.id,
 						name: user.name,
 						gameRoomId: gameRoom!.id,
 						score: user.score!,
-						averageReactionTime: playerAverageReactionTime
+						averageReactionTime,
 					}
 				}))
 

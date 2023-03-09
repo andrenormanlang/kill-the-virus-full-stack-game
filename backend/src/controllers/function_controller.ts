@@ -34,12 +34,6 @@ export const getBestEverReactionTime = () => {
 	})
 }
 
-export const getBestAverageReactionTime = () => {
-	return prisma.averageReactionTime.findFirst({
-		orderBy: { averageReactionTime: 'asc' },
-	})
-}
-
 export const updateScores = async (gameRoomId: string) => {
 	try {
 		const latestReactionTimes = await prisma.reactionTime.findMany({
