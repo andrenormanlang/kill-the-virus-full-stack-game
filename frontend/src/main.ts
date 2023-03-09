@@ -142,7 +142,7 @@ socket.on('reactionTime', (reactionTime) => {
 	(document.querySelector('#opponentTime') as HTMLDivElement).innerText = ` ${reactionTime}`
 })
 
-socket.on('firstRound', (firstRoundData, round, playerData1: PlayerData, playerData2: PlayerData) => {
+socket.on('firstRound', (firstRoundData, playerData1: PlayerData, playerData2: PlayerData) => {
 	const yourNameEl = document.querySelector('.yourName') as HTMLDivElement
 	const opponentNameEl = document.querySelector('.opponentName') as HTMLDivElement
 
@@ -163,8 +163,7 @@ socket.on('firstRound', (firstRoundData, round, playerData1: PlayerData, playerD
 })
 
 socket.on('newRound', (newRoundData) => {
-	const { row, column, delay} = newRoundData
-	displayVirus({ row, column, delay })
+	displayVirus(newRoundData)
 })
 
 socket.on('updateScore', (player1Score: number, player2Score: number, player1Id: string) => {

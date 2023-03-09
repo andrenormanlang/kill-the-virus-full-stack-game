@@ -6,7 +6,7 @@ export { }
 
 // Events emitted by the server to the client
 export interface ServerToClientEvents {
-	firstRound: (firstRoundData: VirusData, round: number, playerData1: PlayerData, playerData2: PlayerData) => void
+	firstRound: (firstRoundData: VirusData, playerData1: PlayerData, playerData2: PlayerData) => void
 	newRound: (newRoundData: NewRoundData) => void
 	endGame: (userDataArray: UserData[]) => void
 	reactionTime: (reactionTime: number) => void

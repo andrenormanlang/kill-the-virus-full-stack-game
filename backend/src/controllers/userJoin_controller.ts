@@ -79,7 +79,7 @@ export const listenForUserJoin = (socket: Socket<ClientToServerEvents, ServerToC
 				gameRoomId: existingRoom.id,
 			}
 
-			io.to(existingRoom.id).emit('firstRound', firstRoundPayload, existingRoom.roundCount, playerData1, playerData2)
+			io.to(existingRoom.id).emit('firstRound', firstRoundPayload, playerData1, playerData2)
 			io.emit('liveGame', liveGamePayload)
 		}
 		catch (err) {
