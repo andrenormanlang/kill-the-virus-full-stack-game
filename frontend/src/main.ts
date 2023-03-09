@@ -19,6 +19,7 @@ const lobbyEl = document.querySelector('#lobby') as HTMLDivElement
 const endGameBoardEl = document.querySelector('#endGameBoard') as HTMLDivElement
 
 // Others
+const winnerTitleEl = document.querySelector('#winnerTitle') as HTMLHeadingElement
 const winnerEl = document.querySelector('#winner') as HTMLHeadingElement
 const yourReactionTimeEl = document.querySelector('#yourReactionTime') as HTMLParagraphElement
 const opponentReactionTimeEl = document.querySelector('#opponentReactionTime') as HTMLParagraphElement
@@ -59,13 +60,6 @@ const displayVirus = (virusData: VirusData) => {
 		startTimer(true)
 	}, delay)
 }
-
-toLobbyEl.addEventListener('click', () => {
-	lobbyEl.style.display = 'block'
-	gameEl.style.display = 'none'
-	endGameBoardEl.style.display = 'none'
-	location.reload()
-})
 
 socket.on('connect', () => {
 	console.log('Connected to server')
@@ -136,6 +130,7 @@ socket.on('endGame', (userDataArray) => {
 	gameEl.style.display = 'none'
 	endGameBoardEl.style.display = 'flex'
 
+	winnerTitleEl.innerText = 'Winner:'
 	winnerEl.innerHTML = userData1.averageReactionTime! < userData2.averageReactionTime! ? userData1.name : userData2.name
 
 	if (userData1.id === socket.id) {
@@ -196,6 +191,15 @@ socket.on('updateScore', (player1Score: number, player2Score: number, player1Id:
 	}
 })
 
+socket.on('opponentLeft', () => {
+	console.log('opponent left :(')
+
+	winnerTitleEl.innerText = 'Opponent left'
+	lobbyEl.style.display = 'none'
+	gameEl.style.display = 'none'
+	endGameBoardEl.style.display = 'flex'
+})
+
 usernameFormEl.addEventListener('submit', e => {
 	e.preventDefault()
 
@@ -225,5 +229,11 @@ gameScreenEl.addEventListener("click", e => {
 	socket.emit('clickVirus', timeTakenToClick)
 })
 
+toLobbyEl.addEventListener('click', () => {
+	lobbyEl.style.display = 'block'
+	gameEl.style.display = 'none'
+	endGameBoardEl.style.display = 'none'
+	location.reload()
+})
 
 export default socket

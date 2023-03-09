@@ -77,6 +77,8 @@ export const handleConnection = async (socket: Socket<ClientToServerEvents, Serv
 			const gameRoom = await findGameRoomById(user.gameRoomId)
 			if (!gameRoom) return
 
+			socket.broadcast.to(gameRoom.id).emit('opponentLeft')
+
 			availableGameRooms.pop()
 
 			const deletedRoom = await deleteGameRoom(user.gameRoomId)

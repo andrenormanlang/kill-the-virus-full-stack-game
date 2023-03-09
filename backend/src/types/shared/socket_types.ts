@@ -18,6 +18,7 @@ export interface ServerToClientEvents {
 	tenLatestGames: (latestGames: LatestGamesData[]) => void
 	bestEverReactionTime: (userName: string | null, time: number | null) => void
 	bestAverageReactionTime: (userName: string | null, averageReactionTime: number) => void
+	opponentLeft: () => void
 }
 
 // Events emitted by the client to the server
