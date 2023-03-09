@@ -277,6 +277,7 @@ main {
 
 	#liveTimer {
 		color: #fff;
+		min-width: 90px;
 	}
 }
   
@@ -307,6 +308,9 @@ main {
 	height: 100px;
 	align-items: center;
 
+	.yourName {
+		margin-right: 1rem;
+	}
 }
 
 .opponent {
@@ -315,6 +319,9 @@ main {
 	width: 100%;
 	height: 100px;
 
+	.opponentName {
+		margin-right: 1rem;
+	}
 }
 
 // After playing Game
