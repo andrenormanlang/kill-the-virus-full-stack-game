@@ -1,0 +1,28 @@
+While on backend folder:
+docker compose -up -d backend
+
+docker exec -it backend npx prisma migrate dev --name init
+
+docker exec -it db psql -U postgres
+
+While on frontend folder:
+docker compose -up -d backend
+
+On the main folder
+docker exec -it db psql -U postgres
+
+To rebuild your Docker app using the provided docker-compose.yml file, follow these steps:
+
+Navigate to the Project Directory: Ensure you're in the root directory of your project, where the docker-compose.yml file is located.
+
+Stop and Remove Existing Containers: To avoid conflicts with existing containers, stop and remove them first.
+
+docker-compose down
+Build and Start the Containers: Use docker-compose to build and start the containers.
+
+docker-compose up --build -d
+This command will rebuild the images according to the Dockerfiles specified and start the containers in detached mode (-d).
+
+Check the Status of the Containers: Ensure that all the services are running correctly.
+
+docker-compose ps

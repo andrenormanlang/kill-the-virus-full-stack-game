@@ -1,0 +1,21 @@
+# Dockerfile.frontend
+
+FROM node:14 AS builder
+WORKDIR /app
+
+# Copy frontend package files
+COPY frontend/package.json frontend/package-lock.json ./frontend/
+RUN cd frontend && npm install
+
+# Copy frontend and backend sources for build
+COPY frontend ./frontend
+COPY backend ./backend
+
+# Set working directory to frontend and build
+WORKDIR /app/frontend
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=builder /app/frontend/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

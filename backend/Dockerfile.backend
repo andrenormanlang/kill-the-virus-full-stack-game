@@ -1,0 +1,29 @@
+# Dockerfile.backend
+
+# Stage 1: Install dependencies and build
+FROM node:14 AS builder
+WORKDIR /app
+
+# Copy package files and install dependencies
+COPY package.json package-lock.json ./
+RUN npm install
+
+# Copy all backend source files
+COPY . .
+
+# Build the project (adjust if you have a specific build command)
+RUN npm run build
+
+# Stage 2: Create the final image
+FROM node:14-alpine
+WORKDIR /app
+
+# Copy built files from builder stage
+COPY --from=builder /app ./
+
+# Expose the application port
+EXPOSE 3000
+
+# Command to run the application
+CMD ["npm", "start"]
+
