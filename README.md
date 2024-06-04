@@ -1,5 +1,6 @@
+# 🦠 KILL THE VIRUS 🦠
 
-Welcome to the Whack-a-Virus game! This is a fun and interactive game where you can test your reaction time by whacking viruses. The game keeps track of the best times and allows multiplayer interaction. Ready to kill some viruses? Let’s get started!
+Welcome to the Kill the Virus game! This is a fun and interactive game where you can test your reaction time by whacking viruses. The game keeps track of the best times and allows multiplayer interaction. Ready to kill some viruses? Let’s get started!
 
 ## 🚀 Quick Start Guide
 
