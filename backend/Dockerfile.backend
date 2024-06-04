@@ -10,6 +10,7 @@ RUN npm install
 
 # Copy all backend source files
 COPY . .
+# COPY .env .env
 
 # Build the project (adjust if you have a specific build command)
 RUN npm run build
