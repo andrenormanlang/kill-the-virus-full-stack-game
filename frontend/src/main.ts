@@ -32,10 +32,12 @@ let username: string | null = null
 let timer = 0.00
 let counter = 0.00
 
+
 const startTimer = (start: boolean) => {
 	const startTime = Date.now()
 
 	if (start) {
+		// @ts-ignore
 		timer = setInterval(() => {
 			counter = Number(((Date.now() - startTime) / 1000).toFixed(3))
 			const liveTimerEl = document.querySelector('#liveTimer')
@@ -51,7 +53,7 @@ const startTimer = (start: boolean) => {
 // Displays the virus do the DOM
 const displayVirus = (virusData: VirusData) => {
 	const { row, column, delay } = virusData
-
+	
 	setTimeout(() => {
 		(document.querySelector('#gameScreen') as HTMLDivElement).innerHTML = `
 			<div class="virus" id="virus" style="grid-row: ${row}; grid-column: ${column};">🦠</div>
