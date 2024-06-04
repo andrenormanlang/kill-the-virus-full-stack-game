@@ -1,0 +1,14 @@
+{
+  "name": "ktv",
+  "scripts": {
+    "postdeploy": "cd backend && npm run build"
+  },
+  "env": {
+    "NPM_CONFIG_PRODUCTION": "false"
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}
